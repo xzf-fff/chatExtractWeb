@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+# 不要索引本地导出数据与产物（兜底：这些文件已通过 .vercelignore 排除）
+Disallow: /deepseek_data*/
+Disallow: /output/
+Disallow: /README.md
+
+Sitemap: https://fastaibook.tech/sitemap.xml

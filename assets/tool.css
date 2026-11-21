@@ -1,0 +1,344 @@
+/* ============================================================
+ * 工具页主题皮肤（加载于各页原有 <style> 之后）
+ * 目标：浅色极简，去掉霓虹渐变 / 玻璃 / 发光；深色模式仅保留低饱和中性色
+ * 结构不变，只覆盖视觉
+ * ============================================================ */
+
+html{
+  --grad:var(--brand);
+  --glass:var(--surface);
+  --glass-2:var(--surface);
+  --cy:var(--brand);
+  --pu:var(--brand);
+  --bl:var(--brand);
+  --r:12px;
+  --r-sm:8px;
+}
+html[data-theme] ::selection{background:var(--brand-soft)}
+html[data-theme] ::-webkit-scrollbar{width:10px;height:10px}
+html[data-theme] ::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:8px;border:3px solid transparent;background-clip:content-box}
+
+/* ---------- 基础 ---------- */
+html[data-theme] body{
+  background:var(--bg);
+  background-image:none;
+  color:var(--tx);
+  font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+html[data-theme] h1,html[data-theme] h2,html[data-theme] h3{letter-spacing:-.012em}
+html[data-theme] .mono{font-family:var(--mono)}
+
+/* ---------- 顶栏 ---------- */
+html[data-theme] .topbar{
+  height:60px;flex-basis:60px;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:none;
+}
+html[data-theme] .brand-mark{
+  background:var(--brand);
+  box-shadow:none;
+}
+html[data-theme] .brand-mark::after{display:none}
+html[data-theme] .brand-mark span{color:#fff;font-weight:700}
+html[data-theme] .brand-title{font-size:14.5px;font-weight:650;letter-spacing:-.01em}
+html[data-theme] .brand-sub{font-size:10.5px;letter-spacing:.08em;color:var(--tx3)}
+html[data-theme] .top-actions{gap:8px}
+
+/* 工具页标题（新加） */
+html[data-theme] .tool-name{
+  display:flex;align-items:center;gap:8px;flex:0 0 auto;margin:0;line-height:1.2;
+  font-size:14px;font-weight:650;letter-spacing:-.01em;color:var(--tx);
+}
+html[data-theme] .tool-name .sep{
+  width:1px;height:16px;background:var(--line-strong);display:inline-block;
+}
+
+/* 版本源 chip */
+html[data-theme] .src-chip{
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:9px;
+}
+html[data-theme] .src-chip .k{
+  background:var(--brand-soft);color:var(--brand);
+  border-radius:6px;
+}
+html[data-theme] .src-chip .c{color:var(--tx3)}
+html[data-theme] .src-empty{
+  border:1px dashed var(--line-strong);color:var(--tx3);background:transparent;
+}
+html[data-theme] .src-pill{
+  background:var(--surface-2);border:1px dashed var(--line-strong);color:var(--tx3);
+}
+html[data-theme] .src-pill.loaded{
+  background:var(--surface-2);border-style:solid;border-color:var(--line);color:var(--tx);
+}
+html[data-theme] .src-pill.loaded .dot{background:var(--ok);box-shadow:none}
+
+/* ---------- 按钮 ---------- */
+html[data-theme] .btn{
+  background:var(--surface);border:1px solid var(--line);color:var(--tx2);
+  border-radius:8px;font-size:13px;height:34px;
+}
+html[data-theme] .btn:hover{background:var(--surface-2);border-color:var(--line-strong);color:var(--tx);transform:none}
+html[data-theme] .btn.primary{
+  background:var(--brand);border-color:var(--brand);color:#fff;
+  box-shadow:none;
+}
+html[data-theme] .btn.primary:hover{background:var(--brand-strong);border-color:var(--brand-strong);color:#fff}
+html[data-theme] .icon-btn{
+  width:34px;height:34px;background:var(--surface);border:1px solid var(--line);color:var(--tx2);border-radius:8px;
+}
+html[data-theme] .icon-btn:hover{background:var(--surface-2);color:var(--tx)}
+html[data-theme] .tool-link{color:var(--tx3);border-radius:6px}
+html[data-theme] .tool-link:hover{color:var(--brand);background:var(--brand-soft)}
+html[data-theme] .mini-btn{
+  color:var(--tx2);background:var(--surface);border:1px solid var(--line);border-radius:6px;
+}
+html[data-theme] .mini-btn:hover{background:var(--surface-2);color:var(--tx);border-color:var(--line-strong)}
+
+/* ---------- 三栏布局 ---------- */
+html[data-theme] .sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--line);
+}
+html[data-theme] .list-panel{border-right:1px solid var(--line);background:var(--bg)}
+html[data-theme] .list-head{background:var(--surface);border-bottom:1px solid var(--line);height:44px;flex-basis:44px}
+html[data-theme] .list-head .count{color:var(--tx3);font-size:11.5px}
+html[data-theme] .field-label{color:var(--tx3);font-size:10.5px;letter-spacing:.11em}
+html[data-theme] .hint{color:var(--tx3);line-height:1.7}
+html[data-theme] .stat-card{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius);
+  box-shadow:none;
+}
+html[data-theme] .stat-row .k{color:var(--tx3)}
+html[data-theme] .stat-row .v{color:var(--tx);font-weight:600}
+html[data-theme] .stat-row .v.acc{
+  background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--brand);
+}
+
+/* 搜索框 / 分段控件 */
+html[data-theme] .search-wrap{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--tx3);
+}
+html[data-theme] .search-wrap:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+html[data-theme] .search-wrap input{background:none;border:none;color:var(--tx);outline:none}
+html[data-theme] .search-wrap .kbd{
+  background:var(--surface);border:1px solid var(--line);color:var(--tx3);border-radius:4px;
+}
+html[data-theme] .seg{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:2px}
+html[data-theme] .seg button{color:var(--tx3);border-radius:6px;background:none}
+html[data-theme] .seg button:hover{color:var(--tx)}
+html[data-theme] .seg button.on{background:var(--surface);color:var(--tx);box-shadow:var(--shadow-sm);font-weight:600}
+
+/* chips */
+html[data-theme] .chip{
+  background:var(--surface);border:1px solid var(--line);color:var(--tx2);border-radius:999px;font-size:12px;
+}
+html[data-theme] .chip:hover{border-color:var(--line-strong);color:var(--tx)}
+html[data-theme] .chip.on{
+  background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600;
+}
+
+/* ---------- 会话列表 ---------- */
+html[data-theme] .row{
+  border-radius:9px;border:1px solid transparent;
+}
+html[data-theme] .row:hover{background:var(--surface-2)}
+html[data-theme] .row.active{background:var(--brand-soft);border-color:var(--line)}
+html[data-theme] .row.sel{background:var(--surface-2)}
+html[data-theme] .row.active.sel{background:var(--brand-soft)}
+html[data-theme] .row.sel::before{background:var(--brand);border-radius:2px}
+html[data-theme] .cb{
+  border:1px solid var(--line-strong);background:var(--surface);border-radius:5px;box-shadow:none;
+}
+html[data-theme] .row.sel .cb{background:var(--brand);border-color:var(--brand)}
+html[data-theme] .row.sel .cb svg{color:#fff}
+html[data-theme] .row-title .t{font-weight:550;color:var(--tx)}
+html[data-theme] .row-sub{color:var(--tx3)}
+html[data-theme] .pill{
+  background:var(--surface-2);border:1px solid var(--line);color:var(--tx2);border-radius:999px;font-size:10.5px;
+}
+html[data-theme] .pill.diff{background:#fff4e6;border-color:#f6d9b0;color:#9a5b00}
+html[data-theme] .pill.only{background:var(--brand-soft);border-color:#cfdcff;color:var(--brand)}
+html[data-theme] .tk i{background:var(--surface-2);border:1px solid var(--line);color:var(--tx3);border-radius:4px}
+html[data-theme] .tk .mono{color:var(--tx2)}
+html[data-theme] .list-empty{color:var(--tx3)}
+
+/* 拖放区 */
+html[data-theme] .drop-zone{
+  background:var(--surface);border:1.5px dashed var(--line-strong);border-radius:var(--radius-lg);
+}
+html[data-theme] .drop-zone.hot{border-color:var(--brand);background:var(--brand-soft)}
+html[data-theme] .dz-icon{
+  background:var(--brand-soft);border:1px solid #dbe6ff;border-radius:12px;
+}
+html[data-theme] .dz-icon svg{color:var(--brand);width:24px;height:24px}
+html[data-theme] .dz-title{color:var(--tx);font-size:15px;font-weight:600}
+html[data-theme] .dz-desc{color:var(--tx2);font-size:12.5px}
+html[data-theme] .dz-tip{color:var(--tx3);border-top:1px solid var(--line)}
+html[data-theme] .dz-sample{color:var(--tx3)}
+html[data-theme] .dz-sample button{color:var(--brand)}
+html[data-theme] .dz-sample button:hover{color:var(--brand-strong)}
+
+/* ---------- 预览（子集工具） ---------- */
+html[data-theme] .preview{
+  background:var(--bg);border-left:1px solid var(--line);
+}
+html[data-theme] .pv-head,html[data-theme] .pv-foot{
+  background:var(--surface);border-color:var(--line);
+}
+html[data-theme] .pv-title{color:var(--tx);font-weight:650}
+html[data-theme] .pv-meta{color:var(--tx3)}
+html[data-theme] .msg.user .bubble{background:var(--brand-soft);border:1px solid #dbe6ff}
+html[data-theme] .msg.ai .bubble{background:var(--surface);border:1px solid var(--line)}
+html[data-theme] .msg-role{color:var(--tx3)}
+html[data-theme] .bubble{color:var(--tx);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+html[data-theme] .bubble.think{background:var(--surface-2);border:1px dashed var(--line-strong);color:var(--tx2)}
+html[data-theme] .bubble.rich{background:var(--surface);border:1px solid var(--line)}
+html[data-theme] .rich code{background:var(--surface-3);color:var(--tx2)}
+html[data-theme] .rich blockquote{border-left:2px solid var(--line-strong);color:var(--tx2)}
+html[data-theme] .rich a{color:var(--brand)}
+html[data-theme] .link-blocked{color:var(--tx3);text-decoration:line-through;text-decoration-color:var(--err)}
+html[data-theme] details.think-fold{background:none;border:1px solid var(--line);border-radius:var(--r-sm)}
+html[data-theme] details.think-fold summary{color:var(--tx3)}
+html[data-theme] .tool-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
+}
+html[data-theme] .tool-card .tc-head b{color:var(--tx2)}
+html[data-theme] .tool-item{border-top:1px solid var(--line)}
+html[data-theme] .tool-item a{color:var(--brand)}
+html[data-theme] .tool-item .src{color:var(--tx3)}
+html[data-theme] .risk{color:var(--warn)}
+html[data-theme] .img-cell{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);
+}
+html[data-theme] .img-cell img{border-radius:6px}
+html[data-theme] .pv-loading{color:var(--tx3)}
+html[data-theme] .skel{background:var(--surface-3)}
+
+/* ---------- 合并面板 ---------- */
+html[data-theme] .merge{
+  background:var(--bg);border-left:1px solid var(--line);
+}
+html[data-theme] .merge-empty{color:var(--tx3)}
+html[data-theme] .merge-head{
+  background:var(--surface);border-bottom:1px solid var(--line);
+}
+html[data-theme] .mh-title{color:var(--tx);font-weight:650}
+html[data-theme] .mh-meta .pill{background:var(--surface-2)}
+html[data-theme] .mh-head-row label{color:var(--tx3)}
+html[data-theme] .mh-head-row .hint{color:var(--tx3)}
+html[data-theme] select{
+  background:var(--surface);border:1px solid var(--line);color:var(--tx);border-radius:7px;
+}
+html[data-theme] .merge-scroll{background:var(--bg)}
+html[data-theme] .diff-row{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+}
+html[data-theme] .diff-row.conflict{border-color:#f0d3a8}
+html[data-theme] .diff-row.resolved{border-color:var(--line)}
+html[data-theme] .dr-head{color:var(--tx2)}
+html[data-theme] .dr-head b{color:var(--tx);font-family:var(--mono)}
+html[data-theme] .dr-head .tag{
+  background:var(--surface-2);border:1px solid var(--line);color:var(--tx3);border-radius:999px;
+}
+html[data-theme] .dr-head .tag.ok{background:#e9f7f0;border-color:#c9ead9;color:var(--ok)}
+html[data-theme] .col{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);
+}
+html[data-theme] .col:hover{border-color:var(--line-strong);background:var(--surface)}
+html[data-theme] .col.on{border-color:var(--brand);background:var(--brand-soft);box-shadow:0 0 0 1px var(--brand)}
+html[data-theme] .col input{accent-color:var(--brand)}
+html[data-theme] .col .chead{color:var(--tx3)}
+html[data-theme] .col .chead .k{background:var(--surface);border:1px solid var(--line);color:var(--tx2)}
+html[data-theme] .col p{color:var(--tx2)}
+html[data-theme] .col details{color:var(--tx3)}
+html[data-theme] .col pre{background:var(--surface);border:1px solid var(--line);color:var(--tx2)}
+html[data-theme] .auto-box{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);
+}
+html[data-theme] .auto-box summary{color:var(--tx3)}
+html[data-theme] .auto-line{border-top:1px solid var(--line);color:var(--tx2)}
+html[data-theme] .auto-line b{color:var(--tx2)}
+html[data-theme] .auto-box .auto-list{color:var(--tx2)}
+
+/* ---------- 导出栏 ---------- */
+html[data-theme] .exportbar{
+  background:var(--surface);border-top:1px solid var(--line);
+  backdrop-filter:none;min-height:64px;box-shadow:none;
+}
+html[data-theme] .val-state{color:var(--tx3)}
+html[data-theme] .val-state .txt{color:var(--tx2)}
+html[data-theme] .val-state.ok .val-dot{background:var(--ok);box-shadow:none}
+html[data-theme] .val-state.warn .val-dot{background:var(--warn);box-shadow:none}
+html[data-theme] .val-state.err .val-dot{background:var(--err);box-shadow:none}
+html[data-theme] .val-more{color:var(--brand)}
+html[data-theme] .export-mid{color:var(--tx3)}
+html[data-theme] .export-mid b{color:var(--tx)}
+html[data-theme] .opt{color:var(--tx2)}
+html[data-theme] .opt input{accent-color:var(--brand)}
+html[data-theme] .btn-gen{
+  background:var(--brand);color:#fff;border-radius:10px;box-shadow:none;font-weight:600;
+}
+html[data-theme] .btn-gen:hover:not(:disabled){background:var(--brand-strong);transform:none}
+html[data-theme] .btn-gen:disabled{opacity:.5}
+html[data-theme] .btn-gen.done{background:var(--ok);color:#fff}
+html[data-theme] .btn-gen .bar{background:rgba(255,255,255,.4)}
+html[data-theme] .btn-gen .ring{border-color:rgba(255,255,255,.35);border-top-color:#fff}
+html[data-theme] .link-demo{
+  background:var(--surface);border:1px solid #bfe3d1;color:var(--ok);border-radius:10px;
+}
+html[data-theme] .link-demo:hover{background:#eefaf4}
+html[data-theme] .import-help{color:var(--tx3)}
+html[data-theme] .import-help:hover{color:var(--tx)}
+
+/* ---------- 对话框 / 提示 ---------- */
+html[data-theme] dialog{
+  background:var(--surface);border:1px solid var(--line);color:var(--tx);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow);max-width:min(760px,94vw);
+}
+html[data-theme] dialog::backdrop{background:rgba(17,24,39,.42);backdrop-filter:none}
+html[data-theme] .dlg-head{border-bottom:1px solid var(--line);padding:16px 18px}
+html[data-theme] .dlg-head h3{font-size:15px;font-weight:650}
+html[data-theme] .dlg-body{padding:18px;color:var(--tx2);line-height:1.8}
+html[data-theme] .dlg-body code{background:var(--surface-2);border:1px solid var(--line);color:var(--tx2)}
+html[data-theme] .dlg-foot{border-top:1px solid var(--line);padding:12px 18px;background:var(--surface-2)}
+html[data-theme] .err-list li.e{color:var(--err)}
+html[data-theme] .err-list li.w{color:var(--warn)}
+html[data-theme] .toasts{max-width:420px}
+html[data-theme] .toast{
+  background:var(--surface);border:1px solid var(--line);color:var(--tx2);
+  border-radius:10px;box-shadow:var(--shadow);backdrop-filter:none;
+}
+html[data-theme] .toast .t-dot{background:var(--brand)}
+html[data-theme] .toast.ok .t-dot{background:var(--ok)}
+html[data-theme] .toast.warn .t-dot{background:var(--warn)}
+html[data-theme] .toast.err .t-dot{background:var(--err)}
+
+/* 拖拽遮罩 */
+html[data-theme] #dragveil{background:rgba(17,24,39,.4);backdrop-filter:none}
+html[data-theme] #dragveil .box{
+  background:var(--surface);border:2px dashed var(--brand);border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+}
+html[data-theme] #dragveil .box h3{color:var(--tx)}
+html[data-theme] #dragveil .box p{color:var(--tx2)}
+
+/* 深色模式下的浅底强调色 */
+html[data-theme="dark"] .pill.diff{background:#3a2a12;border-color:#5a431d;color:#fbbf24}
+html[data-theme="dark"] .pill.only{background:#1a2436;border-color:#2b3b57;color:#8db2ff}
+html[data-theme="dark"] .dr-head .tag.ok{background:#132a21;border-color:#1f4433;color:#4ade80}
+html[data-theme="dark"] .link-demo{border-color:#1f4433;color:#4ade80}
+html[data-theme="dark"] .link-demo:hover{background:#132a21}
+html[data-theme="dark"] .msg.user .bubble{background:#1a2436;border-color:#2b3b57}
+html[data-theme="dark"] .dz-icon{background:#1a2436;border-color:#2b3b57}
+html[data-theme="dark"] .col.on{background:#1a2436;border-color:var(--brand);box-shadow:none}
+
+/* 小屏：工具页顶栏更紧凑 */
+@media (max-width:768px){
+  html[data-theme] .topbar{height:56px;flex-basis:56px}
+  html[data-theme] .exportbar{min-height:60px}
+}

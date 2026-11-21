@@ -1,0 +1,13 @@
+# 本地数据与产物：含个人对话正文与图片，不要凭据化
+deepseek_data*/
+output/
+*.zip
+
+# 内部文件
+.codebuddy/
+
+# 系统杂项
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc

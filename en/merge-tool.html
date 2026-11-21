@@ -1,0 +1,2448 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<script>window.__FORCE_LANG__ = 'en';</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Version merger · ChatExtract</title>
+<style>
+:root{
+  --bg:#0B0F17; --bg2:#121826; --bg3:#1A2233;
+  --tx:#E6EDF7; --tx2:#9AAEC4; --tx3:#6B7F96;
+  --cy:#22D3EE; --pu:#8B5CF6; --bl:#38BDF8;
+  --ok:#34D399; --warn:#FBBF24; --err:#F87171; --line:#2A3446;
+  --grad:linear-gradient(115deg,#22D3EE 0%,#8B5CF6 58%,#38BDF8 100%);
+  --glass:rgba(26,34,51,.62); --glass-2:rgba(18,24,38,.82);
+  --shadow:0 18px 44px rgba(0,0,0,.48);
+  --r:14px;
+  --mono:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;
+  --sans:"PingFang SC",-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+}
+[data-theme="light"]{
+  --bg:#F4F7FB; --bg2:#FFFFFF; --bg3:#EBF1F8;
+  --tx:#0E1726; --tx2:#4A5C72; --tx3:#66788e;
+  --line:#D6E0EC; --glass:rgba(255,255,255,.78); --glass-2:rgba(255,255,255,.94);
+  --shadow:0 18px 40px rgba(23,42,71,.12);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;font-family:var(--sans);font-size:13px;color:var(--tx);overflow:hidden;
+  display:flex;flex-direction:column;height:100vh;background:
+    radial-gradient(1000px 620px at 10% -10%,rgba(34,211,238,.15),transparent 62%),
+    radial-gradient(900px 540px at 92% 0%,rgba(139,92,246,.17),transparent 60%),var(--bg);
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#2c3a52;border-radius:9px;border:2px solid transparent;background-clip:content-box}
+[data-theme="light"] ::-webkit-scrollbar-thumb{background:#c3d1e2;background-clip:content-box}
+button{font-family:inherit;font-size:13px;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font-family:inherit;font-size:13px;color:inherit}
+h1,h2,h3{margin:0;font-weight:600}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.topbar{
+  height:64px;flex:0 0 64px;display:flex;align-items:center;gap:14px;padding:0 18px;
+  border-bottom:1px solid var(--line);background:linear-gradient(180deg,rgba(18,24,38,.94),rgba(11,15,23,.72));
+  backdrop-filter:blur(14px);position:relative;z-index:20;
+}
+[data-theme="light"] .topbar{background:linear-gradient(180deg,rgba(255,255,255,.95),rgba(244,247,251,.82))}
+.brand{display:flex;align-items:center;gap:10px;min-width:190px}
+.brand-mark{
+  width:30px;height:30px;border-radius:9px;background:var(--grad);display:grid;place-items:center;position:relative;overflow:hidden;
+  box-shadow:0 6px 18px rgba(34,211,238,.3),inset 0 0 0 1px rgba(255,255,255,.22);
+}
+.brand-mark::after{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.45),transparent 55%)}
+.brand-mark span{position:relative;font:600 14px/1 var(--mono);color:#04121b}
+.brand-title{font-size:14px;font-weight:600}
+.brand-sub{font-size:10.5px;color:var(--tx3);letter-spacing:.6px;text-transform:uppercase}
+.src-chips{flex:1;display:flex;align-items:center;gap:8px;min-width:0;overflow-x:auto;padding:2px 0}
+.src-chip{
+  display:flex;align-items:center;gap:7px;height:36px;padding:0 10px 0 8px;border-radius:11px;
+  border:1px solid var(--line);background:rgba(26,34,51,.5);white-space:nowrap;max-width:290px;
+}
+.src-chip .k{
+  width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font:600 11px/1 var(--mono);
+  background:linear-gradient(130deg,rgba(34,211,238,.9),rgba(139,92,246,.9));color:#04121b;flex:0 0 auto;
+}
+.src-chip .n{overflow:hidden;text-overflow:ellipsis;font-size:12.5px}
+.src-chip .c{color:var(--tx3);font-size:11px;font-family:var(--mono)}
+.src-chip .x{color:var(--tx3);font-size:14px;line-height:1;padding:2px 0 2px 4px}
+.src-chip .x:hover{color:var(--err)}
+.src-empty{color:var(--tx3);font-size:12.5px;border:1px dashed var(--line);border-radius:10px;padding:6px 12px}
+.top-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+/* 工具切换（子集提取 / 版本合并） */
+.toolswitch{
+  display:flex;align-items:center;gap:2px;padding:2px;flex:0 0 auto;
+  border:1px solid var(--line);border-radius:10px;background:rgba(18,24,38,.55);
+}
+.toolswitch a,.toolswitch .on{
+  display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:8px;
+  font-size:12px;color:var(--tx3);text-decoration:none;white-space:nowrap;transition:.18s;
+}
+.toolswitch a:hover{color:var(--tx)}
+.toolswitch .on{color:#06202b;font-weight:600;background:linear-gradient(120deg,#22D3EE,#38BDF8)}
+[data-theme="light"] .toolswitch{background:rgba(235,241,248,.85)}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;border-radius:10px;
+  border:1px solid var(--line);background:rgba(26,34,51,.55);color:var(--tx2);transition:.18s;white-space:nowrap;
+}
+.btn:hover{color:var(--tx);border-color:#3a4a66;transform:translateY(-1px)}
+.btn.primary{border-color:transparent;color:#04121b;font-weight:600;background:var(--grad);box-shadow:0 8px 22px rgba(34,211,238,.22)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn svg{width:15px;height:15px}
+.icon-btn{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;border:1px solid var(--line);color:var(--tx2)}
+
+.main{flex:1;display:grid;grid-template-columns:280px minmax(0,1fr) minmax(0,1.25fr);min-height:0}
+.sidebar{
+  border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:14px;overflow-y:auto;
+  background:linear-gradient(180deg,rgba(18,24,38,.55),rgba(11,15,23,.15));min-height:0;
+}
+.field-label{font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--tx3);font-weight:600;margin-bottom:7px}
+.src-item{
+  display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid var(--line);border-radius:10px;
+  background:rgba(18,24,38,.55);margin-bottom:6px;
+}
+.src-item .k{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font:600 11px/1 var(--mono);background:var(--bg3);color:var(--tx2);flex:0 0 auto}
+.src-item .meta{flex:1;min-width:0}
+.src-item .nm{font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src-item .sub{font-size:11px;color:var(--tx3);font-family:var(--mono)}
+.src-item .rm{color:var(--tx3);font-size:13px}
+.src-item .rm:hover{color:var(--err)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{height:27px;padding:0 10px;border-radius:8px;border:1px solid var(--line);color:var(--tx3);background:rgba(18,24,38,.5);font-size:12px;transition:.18s}
+.chip:hover{color:var(--tx);border-color:#3a4a66}
+.chip.on{color:#06202b;background:linear-gradient(120deg,#22D3EE,#38BDF8);border-color:transparent;font-weight:600}
+.hint{font-size:11.5px;line-height:1.7;color:var(--tx3)}
+.stat-card{
+  margin-top:auto;border:1px solid var(--line);border-radius:var(--r);padding:13px;display:grid;gap:10px;
+  background:linear-gradient(160deg,rgba(139,92,246,.12),rgba(34,211,238,.06)),var(--glass);
+}
+.stat-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.stat-row .k{color:var(--tx3);font-size:12px}
+.stat-row .v{font-family:var(--mono);font-size:19px;font-weight:600;letter-spacing:-.4px}
+.stat-row .v.acc{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+.list-panel{display:flex;flex-direction:column;min-width:0;min-height:0;border-right:1px solid var(--line)}
+.list-head{
+  height:46px;flex:0 0 46px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid var(--line);
+  background:rgba(11,15,23,.55);
+}
+.list-head .count{color:var(--tx3);font-size:12px}
+.list-head .count b{color:var(--tx);font-family:var(--mono)}
+.tool-link{font-size:12px;color:var(--tx3);padding:4px 6px;border-radius:6px}
+.tool-link:hover{color:var(--cy);background:rgba(34,211,238,.1)}
+.list-scroll{flex:1;overflow-y:auto;padding:8px 10px 16px;min-height:0;position:relative}
+.row{
+  position:relative;display:flex;align-items:center;gap:10px;padding:9px 11px;margin-bottom:4px;border-radius:10px;
+  border:1px solid transparent;cursor:pointer;transition:transform .14s,background .14s,border-color .14s;
+}
+.row:hover{background:rgba(26,34,51,.72);border-color:#2f3d55;transform:translateY(-1px)}
+.row.active{background:linear-gradient(90deg,rgba(34,211,238,.1),rgba(139,92,246,.07));border-color:rgba(34,211,238,.3)}
+.row.sel::before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:3px;background:var(--grad)}
+.cb{width:16px;height:16px;flex:0 0 16px;border-radius:5px;border:1.5px solid #3a4a66;display:grid;place-items:center;transition:.16s;background:rgba(11,15,23,.5)}
+.row.sel .cb{background:var(--grad);border-color:transparent}
+.cb svg{width:10px;height:10px;color:#04121b;opacity:0;transform:scale(.5);transition:.16s}
+.row.sel .cb svg{opacity:1;transform:scale(1)}
+.row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.row-title{display:flex;align-items:center;gap:6px;min-width:0}
+.row-title .t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13.5px}
+.row-sub{display:flex;align-items:center;gap:6px;color:var(--tx3);font-size:11.5px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:1px 6px;border-radius:999px;background:rgba(42,52,70,.6);color:var(--tx2);font-size:11px;font-family:var(--mono)}
+.pill.diff{background:rgba(251,191,36,.14);color:#FBBF24}
+.pill.only{background:rgba(56,189,248,.14);color:#7dd3fc}
+.tk{display:inline-flex;align-items:center;gap:3px}
+.tk i{
+  width:16px;height:16px;border-radius:5px;display:grid;place-items:center;font:600 10px/1 var(--mono);font-style:normal;
+  background:rgba(34,211,238,.16);color:#7dd3fc;
+}
+.list-empty{padding:46px 20px;text-align:center;color:var(--tx3);line-height:1.8}
+.list-empty .le-text{font-size:13.5px;color:var(--tx2)}
+.list-empty .le-sub{font-size:11.5px;color:var(--tx3);margin-top:3px}
+.le-reset{
+  margin-top:12px;height:30px;padding:0 13px;border-radius:8px;font-size:12px;cursor:pointer;
+  border:1px solid var(--line);background:rgba(26,34,51,.6);color:var(--tx2);transition:.18s;
+}
+.le-reset:hover{color:var(--tx);border-color:#3a4a66}
+[data-theme="light"] .le-reset{background:#fff}
+.tool-link:disabled,.chip:disabled{opacity:.38;cursor:not-allowed}
+.tool-link:disabled:hover{color:var(--tx3);background:none}
+.chip:disabled:hover{border-color:var(--line);color:var(--tx3)}
+.drop-zone{
+  position:absolute;inset:10px;border:1.5px dashed #2c3a52;border-radius:18px;display:grid;place-items:center;text-align:center;padding:24px;
+  background:radial-gradient(600px 300px at 50% 30%,rgba(139,92,246,.1),transparent 70%);
+}
+.dz-inner{max-width:420px;display:grid;gap:12px;justify-items:center}
+.dz-icon{width:60px;height:60px;border-radius:17px;background:linear-gradient(150deg,rgba(34,211,238,.22),rgba(139,92,246,.28));border:1px solid rgba(34,211,238,.35);display:grid;place-items:center}
+.dz-icon svg{width:26px;height:26px;color:#a5f3fc}
+.dz-title{font-size:15.5px;font-weight:600}
+.dz-desc{color:var(--tx3);line-height:1.75;font-size:12.5px}
+.dz-tip{color:var(--tx3);font-size:11.5px;border-top:1px solid var(--line);padding-top:12px;line-height:1.7;text-align:left}
+.dz-sample{font-size:12px;color:var(--tx3);display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:center}
+.dz-sample button{color:var(--cy);text-decoration:underline dotted;font-size:12px;padding:2px 4px}
+.dz-sample button:hover{color:#a5f3fc}
+
+.merge{display:flex;flex-direction:column;min-width:0;min-height:0;background:linear-gradient(180deg,rgba(18,24,38,.5),rgba(11,15,23,.2))}
+.merge-empty{flex:1;display:grid;place-items:center;color:var(--tx3);font-size:12.5px;padding:30px;text-align:center;line-height:1.9}
+.merge-head{padding:13px 16px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.mh-top{display:flex;align-items:flex-start;gap:8px}
+.mh-title{font-size:14px;font-weight:600;flex:1;word-break:break-word}
+.mh-meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;color:var(--tx3);font-size:11.5px}
+.mh-head-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mh-head-row label{font-size:11.5px;color:var(--tx3)}
+select{
+  height:30px;border-radius:9px;border:1px solid var(--line);background:var(--bg2);padding:0 8px;max-width:100%;
+}
+.merge-actions{display:flex;align-items:center;gap:8px;padding:9px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.seg{display:inline-grid;grid-auto-flow:column;gap:2px;padding:2px;background:var(--bg2);border:1px solid var(--line);border-radius:9px}
+.seg button{height:25px;padding:0 9px;border-radius:7px;color:var(--tx3);font-size:11.5px}
+.seg button.on{background:linear-gradient(120deg,rgba(34,211,238,.2),rgba(139,92,246,.24));color:var(--tx)}
+.merge-scroll{flex:1;overflow-y:auto;padding:12px 16px 22px;min-height:0;display:flex;flex-direction:column;gap:10px}
+.diff-row{flex:0 0 auto;border:1px solid var(--line);border-radius:11px;background:rgba(26,34,51,.4);overflow:hidden}
+.diff-row.conflict{border-color:rgba(251,191,36,.4);box-shadow:0 0 0 1px rgba(251,191,36,.08)}
+.diff-row.resolved{border-color:rgba(52,211,153,.35)}
+.dr-head{display:flex;align-items:center;gap:8px;padding:8px 11px;font-size:12px;color:var(--tx2);background:rgba(11,15,23,.35);flex-wrap:wrap}
+.dr-head b{color:var(--tx);font-family:var(--mono);font-weight:600}
+.dr-head .tag{padding:1px 7px;border-radius:999px;font-size:10.5px;background:rgba(251,191,36,.16);color:#FBBF24}
+.dr-head .tag.ok{background:rgba(52,211,153,.16);color:#6ee7b7}
+.dr-body{display:grid;gap:8px;padding:10px 11px}
+.col{
+  display:flex;gap:9px;padding:8px 10px;border-radius:9px;border:1px solid var(--line);background:rgba(18,24,38,.5);
+  cursor:pointer;transition:.15s;min-width:0;
+}
+.col:hover{border-color:#3a4a66}
+.col.on{border-color:rgba(34,211,238,.55);background:linear-gradient(120deg,rgba(34,211,238,.1),rgba(139,92,246,.08))}
+.col input{margin-top:3px;accent-color:#22D3EE}
+.col .cbody{flex:1;min-width:0;display:grid;gap:4px}
+.col .chead{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx3)}
+.col .chead .k{
+  width:17px;height:17px;border-radius:5px;display:grid;place-items:center;font:600 10px/1 var(--mono);
+  background:rgba(139,92,246,.2);color:#c4b5fd;
+}
+.col p{margin:0;font-size:12px;line-height:1.65;color:var(--tx2);white-space:pre-wrap;word-break:break-word;max-height:120px;overflow:hidden}
+.col details{font-size:11.5px;color:var(--tx3)}
+.col summary{cursor:pointer;color:#7dd3fc;list-style:none}
+.col summary::-webkit-details-marker{display:none}
+.col pre{margin:6px 0 0;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);font-size:11px;line-height:1.65;color:var(--tx2);max-height:260px;overflow:auto}
+.auto-box{flex:0 0 auto;border:1px solid var(--line);border-radius:11px;background:rgba(18,24,38,.4)}
+.auto-box summary{padding:9px 12px;cursor:pointer;color:var(--tx2);font-size:12px;list-style:none;display:flex;align-items:center;gap:8px}
+.auto-box summary::-webkit-details-marker{display:none}
+.auto-box .auto-list{padding:0 12px 12px;display:grid;gap:5px}
+.auto-line{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--tx3);padding:3px 0;border-top:1px dashed rgba(42,52,70,.7)}
+.auto-line b{color:var(--tx2);font-family:var(--mono);font-weight:600}
+.auto-line .txt{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.exportbar{
+  flex:0 0 auto;display:flex;align-items:center;gap:14px;padding:12px 18px;border-top:1px solid var(--line);
+  background:linear-gradient(0deg,rgba(11,15,23,.96),rgba(18,24,38,.86));backdrop-filter:blur(14px);min-height:68px;flex-wrap:wrap;z-index:15;
+}
+[data-theme="light"] .exportbar{background:linear-gradient(0deg,#fff,rgba(255,255,255,.92))}
+.val-state{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--tx2);max-width:48%}
+.val-dot{width:8px;height:8px;border-radius:50%;background:var(--tx3);flex:0 0 auto}
+.val-state.ok .val-dot{background:var(--ok);box-shadow:0 0 0 4px rgba(52,211,153,.14)}
+.val-state.warn .val-dot{background:var(--warn);box-shadow:0 0 0 4px rgba(251,191,36,.14)}
+.val-state.err .val-dot{background:var(--err);box-shadow:0 0 0 4px rgba(248,113,113,.14)}
+.val-state .txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.val-more{font-size:11.5px;color:var(--cy);text-decoration:underline dotted}
+.export-mid{flex:1;min-width:150px;color:var(--tx3);font-size:12px}
+.export-mid b{color:var(--tx);font-family:var(--mono)}
+.export-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.opt{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--tx3);cursor:pointer;user-select:none}
+.opt input{accent-color:#22D3EE}
+.btn-gen{
+  height:42px;padding:0 20px;border-radius:12px;font-size:13.5px;font-weight:600;color:#04121b;border:none;
+  background:var(--grad);box-shadow:0 12px 28px rgba(34,211,238,.24);display:inline-flex;align-items:center;gap:9px;position:relative;overflow:hidden;
+}
+.btn-gen:hover:not(:disabled){transform:translateY(-1px)}
+.btn-gen:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.btn-gen.done{background:linear-gradient(120deg,#34D399,#22D3EE);color:#052019}
+.btn-gen .ring{width:18px;height:18px;border-radius:50%;border:2px solid rgba(4,18,27,.28);border-top-color:#04121b;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-gen .bar{position:absolute;left:0;bottom:0;height:2px;background:rgba(4,18,27,.55);transition:width .2s}
+.link-demo{
+  height:42px;padding:0 15px;border-radius:12px;border:1px solid rgba(52,211,153,.4);color:#6ee7b7;
+  display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:13px;
+}
+.link-demo:hover{background:rgba(52,211,153,.1)}
+.import-help{font-size:12px;color:var(--tx3);text-decoration:underline dotted}
+
+.toasts{position:fixed;right:18px;bottom:86px;display:flex;flex-direction:column;gap:8px;z-index:80;max-width:380px}
+.toast{
+  border:1px solid var(--line);background:var(--glass-2);backdrop-filter:blur(12px);border-radius:11px;
+  padding:10px 13px;box-shadow:var(--shadow);font-size:12.5px;line-height:1.6;display:flex;gap:8px;
+  animation:toastIn .24s cubic-bezier(.22,1,.36,1);
+}
+.toast .t-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex:0 0 auto;background:var(--cy)}
+.toast.ok .t-dot{background:var(--ok)} .toast.warn .t-dot{background:var(--warn)} .toast.err .t-dot{background:var(--err)}
+@keyframes toastIn{from{opacity:0;transform:translateY(8px) scale(.98)}to{opacity:1;transform:none}}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--bg2);color:var(--tx);padding:0;box-shadow:var(--shadow);max-width:min(820px,94vw)}
+dialog::backdrop{background:rgba(4,8,14,.72);backdrop-filter:blur(3px)}
+.dlg-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dlg-head h3{font-size:14px;flex:1}
+.dlg-body{padding:16px;max-height:66vh;overflow:auto;font-size:12.5px;line-height:1.8;color:var(--tx2)}
+.dlg-body ol,.dlg-body ul{margin:6px 0;padding-left:20px}
+.dlg-body code{background:var(--bg3);padding:1px 5px;border-radius:5px;font-family:var(--mono);font-size:11.5px;color:#a5f3fc}
+.dlg-body pre{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px}
+.dlg-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.err-list{margin:0;padding-left:18px}
+.err-list li{margin:3px 0;word-break:break-word}
+.err-list li.e{color:#fca5a5}
+.err-list li.w{color:#fcd34d}
+
+#dragveil{position:fixed;inset:0;z-index:90;display:none;place-items:center;pointer-events:none;background:rgba(6,10,18,.72);backdrop-filter:blur(4px)}
+#dragveil.on{display:grid}
+#dragveil .box{border:2px dashed var(--cy);border-radius:22px;padding:44px 58px;text-align:center;background:radial-gradient(400px 220px at 50% 40%,rgba(34,211,238,.18),transparent 70%)}
+#dragveil .box h3{font-size:16px;margin-bottom:8px}
+#dragveil .box p{margin:0;color:var(--tx2);font-size:12.5px}
+
+@media (max-width:1200px){
+  .main{grid-template-columns:250px minmax(0,1fr)}
+  .merge{position:fixed;right:0;top:64px;bottom:68px;width:min(560px,96vw);z-index:30;border-left:1px solid var(--line);box-shadow:-24px 0 60px rgba(0,0,0,.5);background:var(--bg2);transform:translateX(102%);transition:transform .26s cubic-bezier(.22,1,.36,1)}
+  .merge.open{transform:none}
+}
+@media (max-width:768px){
+  .brand-title{display:none}
+  .brand{min-width:0}
+  .topbar{padding:0 10px;gap:8px}
+  .toolswitch a,.toolswitch .on{padding:0 8px;font-size:11.5px}
+  .list-head{flex-wrap:wrap;height:auto;min-height:46px;padding:7px 10px;gap:2px 8px}
+  .list-head .count:first-child{display:none}
+  .export-mid{display:none}
+  .val-state{max-width:100%;order:3;width:100%}
+  .main{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:64px;bottom:68px;width:min(280px,84vw);z-index:32;transform:translateX(-102%);transition:transform .26s;background:var(--bg2)}
+  .sidebar.open{transform:none}
+}
+@media (max-width:560px){
+  /* 小屏只留「切到另一个工具」的入口，节省顶栏空间 */
+  .toolswitch{padding:0;border:none;background:none}
+  .toolswitch .on{display:none}
+  .toolswitch a{height:30px;border:1px solid var(--line);border-radius:9px;background:rgba(26,34,51,.55)}
+}
+</style>
+<meta name="description" content="Merge two exports of the same DeepSeek conversation by message id, resolve conflicts, pick a branch head and export a ZIP that imports into chat-demo.">
+<meta name="keywords" content="DeepSeek 对话合并, 版本冲突, 消息分支, chat-demo 导入, 对话导出">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://fastaibook.tech/en/merge-tool.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/merge-tool.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/merge-tool.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/merge-tool.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="Version merger · ChatExtract">
+<meta property="og:description" content="Merge two exports of the same DeepSeek conversation by message id, resolve conflicts, pick a branch head and export a ZIP that imports into chat-demo.">
+<meta property="og:url" content="https://fastaibook.tech/en/merge-tool.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta name="twitter:image:alt" content="ChatExtract — 对话版本合并器">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="ChatExtract 对话版本合并器：解决两次导出之间的冲突">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/tool.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: { title: '对话版本合并器 · ChatExtract', description: '合并两次导出的同一组对话：按消息 id 对齐、逐条解决冲突、选择当前分支，导出可直接导入 chat-demo 的 ZIP。' },
+  en: { title: 'Version merger · ChatExtract', description: 'Merge two exports of the same DeepSeek conversation by message id, resolve conflicts, pick a branch head and export a ZIP that imports into chat-demo.' }
+};
+</script>
+<script src="/assets/i18n-merge.js" defer></script>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ChatExtract Version Merger",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any (web browser)",
+  "url": "https://fastaibook.tech/en/merge-tool.html",
+  "description": "Merge two exports of the same DeepSeek conversation by message id, resolve conflicts and re-export a demo-compatible ZIP.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "对话版本合并器", "item": "https://fastaibook.tech/en/merge-tool.html" }
+  ]
+}
+</script>
+</head>
+<body>
+<header class="site-nav">
+  <a class="logo" href="/en/" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html" aria-current="page"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+<header class="topbar">
+  <h1 class="tool-name">对话版本合并器</h1>
+
+  <div class="src-chips" id="srcChips">
+    <span class="src-empty">尚未载入版本源 · 建议载入 2 个不同日期的导出包</span>
+  </div>
+
+  <div class="top-actions">
+    <button class="btn" id="btnDir">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+      添加文件夹
+    </button>
+    <button class="btn primary" id="btnZip">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v5h4"/></svg>
+      添加 ZIP
+    </button>
+  </div>
+</header>
+
+<div class="main" id="main">
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div class="field-label">版本源</div>
+      <div id="srcList"><div class="hint">未载入。点击右上「添加文件夹 / 添加 ZIP」，或把导出包拖进页面。</div></div>
+    </div>
+
+    <div>
+      <div class="field-label">筛选</div>
+      <div class="chips" id="filterChips">
+        <button class="chip on" data-filter="all">全部</button>
+        <button class="chip" data-filter="diff">有差异</button>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-row"><span class="k">会话组数</span><span class="v mono" id="statGroups">0</span></div>
+      <div class="stat-row"><span class="k">已选导出</span><span class="v acc" id="statSel">0</span></div>
+      <div class="stat-row"><span class="k">当前冲突</span><span class="v mono" id="statConf">0</span></div>
+      <div class="hint" id="statHint">选择左侧会话，逐条决定冲突保留哪一版。</div>
+    </div>
+  </aside>
+
+  <section class="list-panel">
+    <div class="list-head">
+      <span class="count">共 <b id="listTotal">0</b> 组，显示 <b id="listShown">0</b></span>
+      <button class="tool-link" id="selAll">全选当前</button>
+      <button class="tool-link" id="invert">反选</button>
+      <button class="tool-link" id="clearSel">清空</button>
+      <span style="margin-left:auto" class="count">已选 <b id="headSel">0</b></span>
+    </div>
+    <div class="list-scroll" id="listScroll">
+      <div class="drop-zone" id="dropZone">
+        <div class="dz-inner">
+          <div class="dz-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>
+            </svg>
+          </div>
+          <div class="dz-title">把两个不同日期的导出包拖进来</div>
+          <div class="dz-desc">支持文件夹或 .zip，依次载入为 A、B、C…<br>同一会话按消息 id 对齐，逐条选择保留哪一版。</div>
+          <div class="dz-tip">
+            · 每份导出的根目录需含 <code>chat_session_index.json</code> 与 <code>chat_sessions/</code><br>
+            · 只有同一会话 id 才会被视为「同一对话的不同版本」<br>
+            · 合并结果可直接在 chat-demo 里「导入历史对话」验证
+          </div>
+          <div class="dz-sample">
+            还没有数据？
+            <button id="btnSample" type="button">载入内置示例（A 旧版 / B 新版）</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="merge" id="mergePanel">
+    <div class="merge-empty" id="mergeEmpty">
+      载入两个版本源后，点击左侧会话查看差异<br>
+      <span style="font-size:11.5px">只有同一会话 id 才会对齐；冲突行可逐条选择保留哪一版。</span>
+    </div>
+    <div id="mergeBody" style="display:none;flex:1;min-height:0;display:none"></div>
+  </section>
+</div>
+
+<footer class="exportbar">
+  <div class="val-state" id="valState">
+    <span class="val-dot"></span>
+    <span class="txt" id="valText">尚未载入版本源</span>
+    <button class="val-more" id="valMore" style="display:none">查看明细</button>
+  </div>
+  <div class="export-mid" id="exportMid">载入至少两个版本源后可合并导出</div>
+  <div class="export-actions">
+    <label class="opt"><input type="checkbox" id="optUser"> 包含账号信息</label>
+    <button class="import-help" id="btnHelp">导入说明</button>
+    <button class="btn" id="btnSelftest" disabled>自检</button>
+    <a class="link-demo" id="linkDemo" href="https://deepseek-ai.github.io/chat-demo/" target="_blank" rel="noopener" style="display:none">打开 chat-demo 验证</a>
+    <button class="btn-gen" id="btnGen" disabled>
+      <span id="genLabel">合并并导出 ZIP</span>
+      <span class="bar" id="genBar" style="width:0"></span>
+    </button>
+  </div>
+</footer>
+
+<input type="file" id="dirInput" webkitdirectory directory multiple hidden>
+<input type="file" id="zipInput" accept=".zip,application/zip" multiple hidden>
+<div id="dragveil"><div class="box"><h3>松手即可添加为版本源</h3><p>支持导出文件夹或 .zip</p></div></div>
+<div class="toasts" id="toasts"></div>
+
+<dialog id="detailDlg">
+  <div class="dlg-head"><h3 id="dlgTitle">明细</h3><button class="icon-btn" data-close="detailDlg">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dlg-body" id="dlgBody"></div>
+  <div class="dlg-foot"><button class="btn" data-close="detailDlg">关闭</button></div>
+</dialog>
+
+<dialog id="helpDlg">
+  <div class="dlg-head"><h3>合并规则与导入验证</h3><button class="icon-btn" data-close="helpDlg">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dlg-body">
+    <p data-i18n-block="merge.help.1"><b>如何对齐</b>：按 <code>会话 id</code> 分组，按 <code>消息 id</code> 对齐。只在某一版存在的消息自动保留；同一消息 id 内容不同即为「冲突」，由你逐条选择。<b>id 错位会自动纠正</b>：DeepSeek 每次导出可能重排消息 id（中间删过消息，后面的 id 整体前移），此时工具改用「角色 + 正文」的序列对齐，把两份导出的 id 归一化后再比较，并弹出提示。</p>
+    <p data-i18n-block="merge.help.2"><b>内容相同判定</b>：比较 <code>role</code>、<code>parent_id</code> 与 <code>fragments</code>（正文/思考/工具结果）。<b>只差元数据不算冲突</b>：时间戳、token 统计、宽高/文件大小、file_id，<code>CONTENT_RISK</code>/<code>TIP</code> 这类系统安全提示的多一条少一条，以及 <b>content 为空的空片段</b>（例如一边多一个空 <code>REQUEST</code>），都会被忽略。导出时仍取你选中那一版的完整字段，数据不会丢。</p>
+    <p data-i18n-block="merge.help.3"><b>分支</b>：会话本身是消息树，<code>current_message_id</code> 决定 demo 打开时显示哪条分支。合并后可在右栏「当前分支」里选任意叶子节点，未被选中的分支仍然保留在消息里。</p>
+    <p data-i18n-block="merge.help.4"><b>示例</b>：列表空白处的「载入内置示例」会生成两份合成导出（A 旧版 / B 新版），含一条冲突消息、一个新分支和各自的附件。可以直接走完「选冲突 → 选 head → 导出 → 自检」的完整流程，不需要任何真实数据。</p>
+    <p data-i18n-block="merge.help.5"><b>导出</b>：未打开过的会话按默认规则（每条冲突取较新版本）合并；已打开并手动选过的以你的选择为准。索引按合并结果重算 <code>message_count</code>，附件取各版本的并集。</p>
+    <p style="color:var(--warn)" data-i18n-block="merge.help.6">导入会<b>覆盖 demo 本地全部对话</b>；下载的 ZIP 含完整对话，请谨慎分享。</p>
+    <p data-i18n-block="merge.help.7">推荐 Chrome / Edge 最新版。载入失败时请解压后拖入文件夹/ZIP。</p>
+    <p style="color:var(--tx3);font-size:11.5px" data-i18n-block="merge.help.8">本工具为非官方辅助工具，与 DeepSeek 官方无关；chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</p>
+  </div>
+  <div class="dlg-foot"><button class="btn" data-close="helpDlg">知道了</button></div>
+</dialog>
+
+<script>
+(function () {
+'use strict';
+
+/* ============================================================
+ * 0. 基础
+ * ============================================================ */
+const $ = (s, r) => (r || document).querySelector(s);
+const el = (tag, cls, text) => {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text != null) n.textContent = text;
+  return n;
+};
+const debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+const raf = () => new Promise(r => requestAnimationFrame(() => r()));
+const ENC = new TextEncoder();
+const DEC = new TextDecoder('utf-8');
+
+function bytesText(n) {
+  if (!Number.isFinite(n) || n < 0) return '0 B';
+  if (n < 1024) return n + ' B';
+  if (n < 1048576) return (n / 1024).toFixed(1) + ' KB';
+  if (n < 1073741824) return (n / 1048576).toFixed(2) + ' MB';
+  return (n / 1073741824).toFixed(2) + ' GB';
+}
+function fmtDate(iso) {
+  if (typeof iso !== 'string') return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso.slice(0, 16).replace('T', ' ');
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function toast(msg, type, ms) {
+  const box = el('div', 'toast ' + (type || ''));
+  box.appendChild(el('span', 't-dot'));
+  box.appendChild(el('div', '', window.DS_I18N ? DS_I18N.t(msg) : msg));
+  $('#toasts').appendChild(box);
+  setTimeout(() => {
+    box.style.transition = '.25s'; box.style.opacity = '0'; box.style.transform = 'translateY(6px)';
+    setTimeout(() => box.remove(), 260);
+  }, ms || 3600);
+}
+
+/* 规范化序列化：用于判断两条消息内容是否完全相同 */
+function canon(v) {
+  if (v === null || typeof v !== 'object') return JSON.stringify(v);
+  if (Array.isArray(v)) return '[' + v.map(canon).join(',') + ']';
+  const keys = Object.keys(v).sort();
+  return '{' + keys.map(k => JSON.stringify(k) + ':' + canon(v[k])).join(',') + '}';
+}
+/* 冲突判定：只比「内容」，忽略两次导出之间天然会变的元数据。
+ * - 易变字段：时间戳（inserted_at / updated_at / results[].published_at）、
+ *   token 统计、宽高与文件大小、file_id；
+ * - 系统提示片段 CONTENT_RISK / TIP：同一段回答在两份导出里可能多一条/少一条安全提示。
+ * 这些差异不构成「冲突」，但导出时会随所选版本的完整字段原样写入，数据不会丢。 */
+const SIG_VOLATILE = new Set([
+  'inserted_at', 'updated_at', 'published_at', 'token_usage', 'elapsed_secs',
+  'width', 'height', 'file_size', 'file_id',
+]);
+const SIG_BOILER = new Set(['CONTENT_RISK', 'TIP']);
+const SIG_CACHE = new WeakMap();
+
+function stripVolatile(v) {
+  if (Array.isArray(v)) return v.map(stripVolatile);
+  if (v && typeof v === 'object') {
+    const out = {};
+    for (const k of Object.keys(v)) {
+      if (SIG_VOLATILE.has(k)) continue;
+      out[k] = stripVolatile(v[k]);
+    }
+    return out;
+  }
+  return v;
+}
+
+/* 空片段：两次导出里可能一边有、一边没有（比如 content 为空的 REQUEST），
+ * 它不带任何信息，不该让整条消息变成「冲突」。 */
+function isEmptyFragment(f) {
+  if (!f || typeof f !== 'object') return true;
+  if (typeof f.content === 'string' && f.content.trim()) return false;
+  for (const key of ['files', 'queries', 'results']) {
+    if (Array.isArray(f[key]) && f[key].length) return false;
+  }
+  if (f.url || f.pattern) return false;
+  return true;
+}
+
+/* 参与比较的片段：去掉系统提示与空片段 */
+function meaningfulFragments(m) {
+  const list = Array.isArray(m && m.fragments) ? m.fragments : [];
+  return list.filter(f => f && !SIG_BOILER.has(f.type) && !isEmptyFragment(f));
+}
+
+function msgSig(m) {
+  if (!m || typeof m !== 'object') return canon(m);
+  const cached = SIG_CACHE.get(m);
+  if (cached) return cached;
+  const frags = meaningfulFragments(m).map(stripVolatile);
+  const sig = canon({ role: m.role, parent_id: m.parent_id == null ? null : m.parent_id, fragments: frags });
+  SIG_CACHE.set(m, sig);
+  return sig;
+}
+
+/* ---------- 版本对齐：id 重排兜底 ----------
+ * DeepSeek 每次导出会重新编排消息 id：中间删过消息后，后面的 id 整体前移
+ *（实测同一会话 A 的 #383 与 B 的 #373 是同一条「2022地市」）。
+ * 若仍按 id 对齐，从错位点开始整段对话都会配错，制造大量假冲突。
+ * 这里先用「角色 + 正文」做 LCS 序列对齐，把各版本 id 归一化成同一套编号，
+ * 下游的 diff / 合并 / 当前分支逻辑仍然只按 id 工作。 */
+
+const ALIGN_CACHE = new WeakMap();
+
+function alignKey(m) {
+  if (!m || typeof m !== 'object') return '';
+  const hit = ALIGN_CACHE.get(m);
+  if (hit) return hit;
+  const frags = meaningfulFragments(m).map(stripVolatile);
+  const key = canon({ role: m.role, fragments: frags });
+  ALIGN_CACHE.set(m, key);
+  return key;
+}
+
+/* 最长公共子序列：返回内容完全相同的下标配对 [[i, j], ...] */
+function lcsPairs(a, b) {
+  const n = a.length, m = b.length;
+  if (!n || !m) return [];
+  const w = m + 1;
+  const dp = new Int32Array((n + 1) * w);
+  for (let i = n - 1; i >= 0; i--) {
+    const row = i * w, next = (i + 1) * w;
+    for (let j = m - 1; j >= 0; j--) {
+      dp[row + j] = a[i] === b[j]
+        ? dp[next + j + 1] + 1
+        : Math.max(dp[next + j], dp[row + j + 1]);
+    }
+  }
+  const pairs = [];
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (a[i] === b[j]) { pairs.push([i, j]); i++; j++; }
+    else if (dp[(i + 1) * w + j] >= dp[i * w + j + 1]) i++;
+    else j++;
+  }
+  return pairs;
+}
+
+function pickRefVersion(versions) {
+  return versions.slice().sort((a, b) =>
+    String(b.entry.updated_at || '').localeCompare(String(a.entry.updated_at || '')))[0];
+}
+
+/* 对齐并重编号；返回是否真的做了重排。id 本来就一致时不动。 */
+function canonicalizeVersions(versions) {
+  if (versions.length < 2) return false;
+  const ref = pickRefVersion(versions);
+  const refMsgs = (ref.session && ref.session.messages) || [];
+  if (!refMsgs.length) return false;
+  if (versions.every(v => v.session && v.session.__aligned)) return false;
+
+  const refKeys = refMsgs.map(alignKey);
+
+  // 先比较：按 id 能配上多少 / 按内容能配上多少。内容明显更好才重排。
+  let idHits = 0, lcsHits = 0;
+  for (const v of versions) {
+    if (v === ref) continue;
+    const msgs = (v.session && v.session.messages) || [];
+    const byId = new Map();
+    for (const m of msgs) byId.set(m.id, m);
+    for (const m of refMsgs) {
+      const other = byId.get(m.id);
+      if (other && alignKey(other) === alignKey(m)) idHits++;
+    }
+    lcsHits += lcsPairs(refKeys, msgs.map(alignKey)).length;
+  }
+  if (!(lcsHits > idHits * 1.1 + 5)) return false;
+
+  // slotKey -> 该 slot 在各版本里的消息下标
+  const slots = new Map();
+  const slotOrder = new Map();
+  function touch(key, order) {
+    let s = slots.get(key);
+    if (!s) { s = new Map(); slots.set(key, s); slotOrder.set(key, order); }
+    return s;
+  }
+
+  refMsgs.forEach((m, i) => touch('R' + i, [i, 0, 0]).set(ref.key, i));
+
+  for (const v of versions) {
+    if (v === ref) continue;
+    const msgs = (v.session && v.session.messages) || [];
+    const pairs = lcsPairs(refKeys, msgs.map(alignKey));
+    let prevRef = -1, prevV = -1;
+
+    // 两个锚点之间的空档：参考版本里没被锚定的消息（往往是改写过的），
+    // 与本版本空档里的消息按顺序配对 → 落成同一 slot → 判为冲突
+    const flushGap = (nextRef, nextV) => {
+      const refGap = [];
+      for (let i = prevRef + 1; i < nextRef; i++) refGap.push(i);
+      const vGap = [];
+      for (let j = prevV + 1; j < nextV; j++) vGap.push(j);
+      const pair = Math.min(refGap.length, vGap.length);
+      for (let k = 0; k < pair; k++) touch('R' + refGap[k], [refGap[k], 0, 0]).set(v.key, vGap[k]);
+      for (let k = pair; k < vGap.length; k++) {
+        touch('X' + v.key + '_' + prevRef + '_' + k, [prevRef, 1, k]).set(v.key, vGap[k]);
+      }
+    };
+
+    for (const [ri, vi] of pairs) {
+      flushGap(ri, vi);
+      touch('R' + ri, [ri, 0, 0]).set(v.key, vi);
+      prevRef = ri; prevV = vi;
+    }
+    flushGap(refMsgs.length, msgs.length);
+  }
+
+  const ordered = Array.from(slots.keys()).sort((a, b) => {
+    const oa = slotOrder.get(a), ob = slotOrder.get(b);
+    return oa[0] - ob[0] || oa[1] - ob[1] || oa[2] - ob[2];
+  });
+  const slotId = new Map();
+  ordered.forEach((k, i) => slotId.set(k, i + 1));
+
+  // 回写：id、parent_id（按原版本内的父子链回溯）、current_message_id
+  for (const v of versions) {
+    const msgs = (v.session && v.session.messages) || [];
+    const newIdAt = new Array(msgs.length);
+    for (const [key, map] of slots) {
+      if (map.has(v.key)) newIdAt[map.get(v.key)] = slotId.get(key);
+    }
+    const oldToNew = new Map();
+    const byOld = new Map();
+    msgs.forEach((m, i) => { oldToNew.set(m.id, newIdAt[i]); byOld.set(m.id, m); });
+    msgs.forEach((m, i) => {
+      let p = m.parent_id, guard = 0;
+      while (p != null && !oldToNew.has(p) && guard++ < 1000) {
+        const pm = byOld.get(p);
+        p = pm ? pm.parent_id : null;
+      }
+      m.parent_id = p == null ? null : (oldToNew.get(p) == null ? null : oldToNew.get(p));
+      m.id = newIdAt[i];
+    });
+    const cur = v.session.current_message_id;
+    v.session.current_message_id = oldToNew.has(cur) ? oldToNew.get(cur) : null;
+    v.session.__aligned = true;
+  }
+  return true;
+}
+
+/* ============================================================
+ * 1. CRC32 / ZIP 读写（与 subset-tool 同实现）
+ * ============================================================ */
+const CRC_TABLE = (() => {
+  const t = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let k = 0; k < 8; k++) c = c & 1 ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[i] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(bytes) {
+  let c = 0xFFFFFFFF;
+  for (let i = 0; i < bytes.length; i++) c = CRC_TABLE[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+const HAS_DS = typeof DecompressionStream === 'function';
+const HAS_CS = typeof CompressionStream === 'function';
+
+async function parseZip(blob) {
+  const size = blob.size;
+  if (size < 22) throw new Error('不是有效的 ZIP 文件（体积过小）');
+  const tailLen = Math.min(size, 65557);
+  const tail = new Uint8Array(await blob.slice(size - tailLen).arrayBuffer());
+  const tv = new DataView(tail.buffer, tail.byteOffset, tail.byteLength);
+  let eocd = -1;
+  for (let i = tail.length - 22; i >= 0; i--) {
+    if (tv.getUint32(i, true) === 0x06054B50 && i + 22 + tv.getUint16(i + 20, true) === tail.length) { eocd = i; break; }
+  }
+  if (eocd < 0) throw new Error('不是有效的 ZIP 文件（缺少目录结尾记录）');
+  const count = tv.getUint16(eocd + 10, true);
+  const cdSize = tv.getUint32(eocd + 12, true);
+  const cdOff = tv.getUint32(eocd + 16, true);
+  if (count === 0xFFFF || cdOff === 0xFFFFFFFF || cdSize === 0xFFFFFFFF) {
+    throw new Error('该 ZIP 使用了 ZIP64 格式，暂不支持；请解压后拖入文件夹/ZIP');
+  }
+  if (cdOff + cdSize > size) throw new Error('ZIP 目录偏移越界，文件可能已损坏');
+  const cd = new Uint8Array(await blob.slice(cdOff, cdOff + cdSize).arrayBuffer());
+  const cv = new DataView(cd.buffer, cd.byteOffset, cd.byteLength);
+  const entries = new Map();
+  let p = 0;
+  for (let i = 0; i < count; i++) {
+    if (p + 46 > cd.length || cv.getUint32(p, true) !== 0x02014B50) throw new Error('ZIP 中央目录损坏');
+    const flags = cv.getUint16(p + 8, true);
+    const method = cv.getUint16(p + 10, true);
+    const crc = cv.getUint32(p + 16, true);
+    const csize = cv.getUint32(p + 20, true);
+    const usize = cv.getUint32(p + 24, true);
+    const nlen = cv.getUint16(p + 28, true);
+    const elen = cv.getUint16(p + 30, true);
+    const clen = cv.getUint16(p + 32, true);
+    const off = cv.getUint32(p + 42, true);
+    if (flags & 0x1) throw new Error('该 ZIP 已加密，无法读取');
+    if (csize === 0xFFFFFFFF || usize === 0xFFFFFFFF || off === 0xFFFFFFFF) {
+      throw new Error('该 ZIP 使用了 ZIP64 格式，暂不支持；请解压后拖入文件夹/ZIP');
+    }
+    const name = DEC.decode(cd.subarray(p + 46, p + 46 + nlen));
+    entries.set(name, { name, flags, method, crc, csize, usize, off });
+    p += 46 + nlen + elen + clen;
+  }
+  return { blob, entries };
+}
+
+async function inflateRaw(bytes) {
+  if (!HAS_DS) throw new Error('当前浏览器不支持解压 deflate；请改用 Chrome / Edge，或解压后拖入文件夹/ZIP');
+  const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+async function deflateRaw(bytes) {
+  if (!HAS_CS) return null;
+  try {
+    const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+    return new Uint8Array(await new Response(stream).arrayBuffer());
+  } catch (e) { return null; }
+}
+async function readZipEntry(zip, entry) {
+  const lh = new Uint8Array(await zip.blob.slice(entry.off, entry.off + 30).arrayBuffer());
+  if (lh.length < 30) throw new Error('ZIP 本地文件头截断：' + entry.name);
+  const lv = new DataView(lh.buffer, lh.byteOffset, lh.byteLength);
+  if (lv.getUint32(0, true) !== 0x04034B50) throw new Error('ZIP 本地文件头损坏：' + entry.name);
+  const start = entry.off + 30 + lv.getUint16(26, true) + lv.getUint16(28, true);
+  const raw = new Uint8Array(await zip.blob.slice(start, start + entry.csize).arrayBuffer());
+  if (entry.method === 0) return raw;
+  if (entry.method === 8) return inflateRaw(raw);
+  throw new Error('不支持的压缩方式 ' + entry.method + '：' + entry.name);
+}
+
+function isAsciiName(name) {
+  if (!name || name.includes('\\') || name.startsWith('/')) return false;
+  if (/^[A-Za-z]:/.test(name)) return false;
+  if (name.split('/').some(seg => !seg || seg === '.' || seg === '..')) return false;
+  return /^[\x20-\x7E]+$/.test(name);
+}
+
+/* ============================================================
+ * 2. 数据源
+ * ============================================================ */
+class FolderSource {
+  constructor(label, records) {
+    this.kind = 'folder'; this.label = label; this.map = new Map();
+    for (const r of records) this.map.set(r.path, r.file);
+  }
+  has(p) { return this.map.has(p); }
+  sizeOf(p) { const f = this.map.get(p); return f ? f.size : 0; }
+  async readBytes(p) {
+    const f = this.map.get(p);
+    if (!f) throw new Error('文件不存在：' + p);
+    return new Uint8Array(await f.arrayBuffer());
+  }
+  async readText(p) { return DEC.decode(await this.readBytes(p)); }
+  filesUnder(prefix) {
+    const out = [];
+    for (const k of this.map.keys()) if (k.startsWith(prefix)) out.push(k);
+    return out.sort();
+  }
+  countImages() { let n = 0; for (const k of this.map.keys()) if (k.includes('_files/')) n++; return n; }
+}
+
+class ZipSource {
+  constructor(label, zip) {
+    this.kind = 'zip'; this.label = label; this.zip = zip; this.cache = new Map();
+  }
+  has(p) { return this.zip.entries.has(p); }
+  sizeOf(p) { const e = this.zip.entries.get(p); return e ? e.usize : 0; }
+  async readBytes(p) {
+    if (this.cache.has(p)) return this.cache.get(p);
+    const e = this.zip.entries.get(p);
+    if (!e) throw new Error('文件不存在：' + p);
+    const bytes = await readZipEntry(this.zip, e);
+    if (this.cache.size > 24) this.cache.delete(this.cache.keys().next().value);
+    this.cache.set(p, bytes);
+    return bytes;
+  }
+  async readText(p) { return DEC.decode(await this.readBytes(p)); }
+  filesUnder(prefix) {
+    const out = [];
+    for (const k of this.zip.entries.keys()) if (k.startsWith(prefix) && !k.endsWith('/')) out.push(k);
+    return out.sort();
+  }
+  countImages() { let n = 0; for (const k of this.zip.entries.keys()) if (k.includes('_files/')) n++; return n; }
+}
+
+function detectDataRoot(paths) {
+  let best = null;
+  for (const p of paths) {
+    if (!p.endsWith('chat_session_index.json')) continue;
+    const root = p.slice(0, p.length - 'chat_session_index.json'.length);
+    if (best === null || root.length < best.length) best = root;
+  }
+  return best;
+}
+
+function readEntryRecursive(entry, prefix, out) {
+  return new Promise((resolve, reject) => {
+    if (entry.isFile) {
+      entry.file(f => { out.push({ path: prefix + f.name, file: f }); resolve(); }, reject);
+      return;
+    }
+    if (!entry.isDirectory) return resolve();
+    const reader = entry.createReader();
+    const all = [];
+    const readBatch = () => {
+      reader.readEntries(batch => {
+        if (!batch.length) {
+          Promise.all(all.map(e => readEntryRecursive(e, prefix + entry.name + '/', out))).then(resolve, reject);
+          return;
+        }
+        all.push(...batch);
+        readBatch();
+      }, reject);
+    };
+    readBatch();
+  });
+}
+
+/* ============================================================
+ * 3. 状态
+ * ============================================================ */
+const state = {
+  sources: [],
+  groups: new Map(),
+  selection: new Set(),
+  filter: 'all',
+  active: null,
+  loaded: null,
+  cache: new Map(),
+  includeUser: false,
+  generating: false,
+  result: null,
+  validation: { errors: [], warnings: [] },
+};
+const els = {
+  srcChips: $('#srcChips'), srcList: $('#srcList'), listScroll: $('#listScroll'),
+  mergePanel: $('#mergePanel'), mergeEmpty: $('#mergeEmpty'), mergeBody: $('#mergeBody'),
+  valState: $('#valState'), valText: $('#valText'), valMore: $('#valMore'),
+  exportMid: $('#exportMid'), btnGen: $('#btnGen'), genLabel: $('#genLabel'), genBar: $('#genBar'),
+  btnSelftest: $('#btnSelftest'), linkDemo: $('#linkDemo'), optUser: $('#optUser'),
+};
+
+const nextKey = () => {
+  let i = state.sources.length;
+  const used = new Set(state.sources.map(s => s.key));
+  while (used.has(String.fromCharCode(65 + i))) i++;
+  return String.fromCharCode(65 + i);
+};
+
+/* ============================================================
+ * 4. 添加版本源
+ * ============================================================ */
+async function addFolderSource(fileList, presetPaths, label) {
+  const records = [];
+  for (let i = 0; i < fileList.length; i++) {
+    const f = fileList[i];
+    const rel = (presetPaths && presetPaths[i]) || f.webkitRelativePath || f.name;
+    records.push({ path: rel.replace(/\\/g, '/'), file: f });
+  }
+  const root = detectDataRoot(records.map(r => r.path));
+  if (root === null) throw new Error('未找到 chat_session_index.json；请选择导出包所在文件夹，或直接拖入导出 ZIP');
+  const stripped = records.filter(r => r.path.startsWith(root)).map(r => ({ path: r.path.slice(root.length), file: r.file }));
+  const name = label || root.replace(/\/$/, '').split('/').pop() || 'folder';
+  await registerSource(new FolderSource(name, stripped));
+}
+
+async function addZipSource(file) {
+  const zip = await parseZip(file);
+  const names = Array.from(zip.entries.keys());
+  const root = detectDataRoot(names);
+  if (root === null) throw new Error('ZIP 里没有找到 chat_session_index.json；请解压后拖入文件夹/ZIP');
+  if (root) {
+    const remapped = new Map();
+    for (const [name, meta] of zip.entries) {
+      if (!name.startsWith(root)) continue;
+      const short = name.slice(root.length);
+      remapped.set(short, Object.assign({}, meta, { name: short }));
+    }
+    zip.entries = remapped;
+  }
+  await registerSource(new ZipSource(file.name, zip));
+}
+
+/* ============================================================
+ * 4.5 内置示例：两份合成的导出数据，无需真实文件即可体验
+ * ============================================================ */
+const SAMPLE = { main: 'demo-merge-main', extra: 'demo-merge-extra' };
+/* 1×1 透明 PNG，仅用于演示附件并集 */
+const SAMPLE_PNG_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFAAH/q842iQAAAABJRU5ErkJggg==';
+
+function sampleBlob(v) {
+  return new Blob([typeof v === 'string' ? ENC.encode(v) : v]);
+}
+function sampleFileObj(exportPath, fileName, size, ts) {
+  return {
+    id: 'sample-file-' + fileName, file_name: fileName, file_size: size, token_usage: 12,
+    inserted_at: ts, export_path: exportPath, is_image: true, width: 1, height: 1,
+  };
+}
+function sampleMsg(id, role, parent, text, ts, files) {
+  const fragments = [{ type: role === 'USER' ? 'REQUEST' : 'RESPONSE', content: text }];
+  if (files && files.length) fragments.push({ type: 'FILE', files });
+  return {
+    id, parent_id: parent, role, status: 'FINISHED',
+    thinking_enabled: false, search_enabled: false, accumulated_token_usage: 16,
+    inserted_at: ts, fragments,
+  };
+}
+function sampleIndexRow(s) {
+  return {
+    id: s.id, title: s.title, pinned: false,
+    message_count: s.messages.length, inserted_at: s.inserted_at, updated_at: s.updated_at,
+  };
+}
+
+async function loadSample() {
+  const png = Uint8Array.from(atob(SAMPLE_PNG_B64), c => c.charCodeAt(0));
+  const en = window.DS_I18N && DS_I18N.lang === 'en';
+  const labelMain = en ? 'Sample A · 2026-11-01' : '示例 A · 2026-11-01';
+  const labelExtra = en ? 'Sample B · 2026-11-15' : '示例 B · 2026-11-15';
+  const titleMain = en ? 'Sample: merging two versions' : '示例：两个版本怎么合并';
+  const titleExtra = en ? 'Sample: only present in B' : '示例：只在 B 里的会话';
+  const { main, extra } = SAMPLE;
+  const aImg = 'chat_sessions/' + main + '_files/a-old.png';
+  const bImg = 'chat_sessions/' + main + '_files/b-new.png';
+
+  const oldA = {
+    id: main, title: titleMain, pinned: false,
+    current_message_id: 4,
+    inserted_at: '2026-11-01T06:00:00.000Z',
+    updated_at: '2026-11-01T06:01:20.000Z',
+    messages: [
+      sampleMsg(1, 'USER', null, '导出数据能不能合并两个版本？', '2026-11-01T06:00:01.000Z'),
+      sampleMsg(2, 'ASSISTANT', 1, '先说结论：可以，按消息 id 对齐就行。', '2026-11-01T06:00:04.000Z'),
+      sampleMsg(3, 'USER', 2, '那旧版里写的「只能按较新的导出覆盖」还算数吗？', '2026-11-01T06:01:10.000Z',
+        [sampleFileObj(aImg, 'a-old.png', png.length, '2026-11-01T06:01:10.000Z')]),
+      sampleMsg(4, 'ASSISTANT', 3, '（旧版回答）这条分支只在 A 里存在。', '2026-11-01T06:01:20.000Z'),
+    ],
+  };
+  const newB = {
+    id: main, title: titleMain, pinned: false,
+    current_message_id: 5,
+    inserted_at: '2026-11-01T06:00:00.000Z',
+    updated_at: '2026-11-15T08:02:40.000Z',
+    messages: [
+      sampleMsg(1, 'USER', null, '导出数据能不能合并两个版本？', '2026-11-15T08:00:01.000Z'),
+      sampleMsg(2, 'ASSISTANT', 1, '先说结论：可以，按消息 id 对齐就行。', '2026-11-15T08:00:04.000Z'),
+      sampleMsg(3, 'USER', 2, '那旧版里写的「只能按较新的导出覆盖」还算数吗？（已更新）', '2026-11-15T08:01:10.000Z',
+        [sampleFileObj(bImg, 'b-new.png', png.length, '2026-11-15T08:01:10.000Z')]),
+      sampleMsg(5, 'ASSISTANT', 3, '（新版回答）这句话在 11-15 的版本里改过了。', '2026-11-15T08:01:20.000Z'),
+      sampleMsg(6, 'USER', 2, '顺便问一下，另一个分支怎么保留？', '2026-11-15T08:02:30.000Z'),
+      sampleMsg(7, 'ASSISTANT', 6, '消息都保留，只有 current_message_id 指向当前分支。', '2026-11-15T08:02:40.000Z'),
+    ],
+  };
+  const onlyB = {
+    id: extra, title: titleExtra, pinned: false,
+    current_message_id: 2,
+    inserted_at: '2026-11-15T08:10:00.000Z',
+    updated_at: '2026-11-15T08:10:06.000Z',
+    messages: [
+      sampleMsg(1, 'USER', null, '这组对话是 B 新增的，A 里没有。', '2026-11-15T08:10:00.000Z'),
+      sampleMsg(2, 'ASSISTANT', 1, '它只在 B 里存在，切到「全部」就能看到。', '2026-11-15T08:10:06.000Z'),
+    ],
+  };
+
+  const recA = [
+    ['chat_session_index.json', JSON.stringify([sampleIndexRow(oldA)])],
+    ['chat_sessions/' + main + '.json', JSON.stringify(oldA)],
+    [aImg, png],
+  ];
+  const recB = [
+    ['chat_session_index.json', JSON.stringify([sampleIndexRow(newB), sampleIndexRow(onlyB)])],
+    ['chat_sessions/' + main + '.json', JSON.stringify(newB)],
+    ['chat_sessions/' + extra + '.json', JSON.stringify(onlyB)],
+    [bImg, png],
+  ];
+  await registerSource(new FolderSource(labelMain,
+    recA.map(([p, v]) => ({ path: p, file: sampleBlob(v) }))));
+  await registerSource(new FolderSource(labelExtra,
+    recB.map(([p, v]) => ({ path: p, file: sampleBlob(v) }))));
+
+  state.selection = new Set(state.groups.keys());
+  renderList();
+  updateStats();
+  await validateSelection();
+  await openSession(main);
+  updateStats();
+  toast('示例已载入：A（11-01）是旧版，B（11-15）是新版；消息 #3 为冲突，#6/#7 为新分支，附件也各不相同', 'ok', 8000);
+}
+
+async function registerSource(source) {
+  if (!source.has('chat_session_index.json')) throw new Error('数据源缺少 chat_session_index.json');
+  let index;
+  try {
+    index = JSON.parse(await source.readText('chat_session_index.json'));
+  } catch (e) {
+    throw new Error('chat_session_index.json 不是合法 JSON');
+  }
+  if (!Array.isArray(index)) throw new Error('chat_session_index.json 顶层应为数组');
+  const key = nextKey();
+  state.sources.push({ key, label: source.label, source, index: index.filter(x => x && typeof x.id === 'string') });
+  state.cache.clear();          // 版本源变了，之前读入的会话版本（含 id 归一化结果）全部作废
+  state.realignedHint = false;
+  rebuildGroups();
+  renderSources();
+  renderList();
+  updateStats();
+  await validateSelection();
+  $('#dropZone') && $('#dropZone').remove();
+  toast('已添加版本 ' + key + '：' + source.label + '（' + index.length + ' 组对话）', 'ok');
+}
+
+function removeSource(key) {
+  state.sources = state.sources.filter(s => s.key !== key);
+  state.cache.clear();          // 版本源变了，缓存的会话版本全部作废
+  state.realignedHint = false;
+  if (state.active && !state.groups.get(state.active)) state.active = null;
+  rebuildGroups();
+  renderSources();
+  renderList();
+  updateStats();
+  if (state.active) openSession(state.active); else showMergeEmpty();
+  validateSelection();
+}
+
+/* ============================================================
+ * 5. 分组索引
+ * ============================================================ */
+function rebuildGroups() {
+  const prev = new Set(state.selection);
+  const g = new Map();
+  for (const s of state.sources) {
+    for (const e of s.index) {
+      let row = g.get(e.id);
+      if (!row) { row = { id: e.id, byKey: new Map() }; g.set(e.id, row); }
+      row.byKey.set(s.key, e);
+    }
+  }
+  state.groups = g;
+  const next = new Set();
+  for (const id of g.keys()) {
+    if (prev.has(id)) next.add(id);
+  }
+  // 新出现的会话默认选中（首次载入时全选）
+  if (!prev.size) for (const id of g.keys()) next.add(id);
+  else {
+    for (const id of g.keys()) if (!prev.has(id) && g.get(id).byKey.size === state.sources.length) next.add(id);
+  }
+  state.selection = next;
+}
+
+function newestKey(row) {
+  let best = null;
+  let bestTs = '';
+  for (const [k, e] of row.byKey) {
+    const ts = String(e.updated_at || '');
+    if (!best || ts > bestTs) { best = k; bestTs = ts; }
+  }
+  return best;
+}
+function oldestKey(row) {
+  let best = null;
+  let bestTs = '';
+  for (const [k, e] of row.byKey) {
+    const ts = String(e.updated_at || '');
+    if (!best || ts < bestTs) { best = k; bestTs = ts; }
+  }
+  return best;
+}
+function rowTitle(row) {
+  const k = newestKey(row);
+  const e = k ? row.byKey.get(k) : null;
+  return (e && e.title) || '(无标题)';
+}
+function rowDiffKind(row) {
+  if (state.sources.length < 2) return 'single';
+  if (row.byKey.size < state.sources.length) return 'partial';
+  const counts = new Set(Array.from(row.byKey.values()).map(e => e.message_count));
+  const stamps = new Set(Array.from(row.byKey.values()).map(e => e.updated_at));
+  if (counts.size > 1 || stamps.size > 1) return 'diff';
+  return 'same';
+}
+
+/* ============================================================
+ * 6. 列表
+ * ============================================================ */
+function filteredRows() {
+  const rows = Array.from(state.groups.values());
+  const list = rows.filter(row => {
+    // 「有差异」= 各版本都有、但内容不同（仅单源出现的会话不算，避免整表刷屏）
+    if (state.filter === 'diff') return rowDiffKind(row) === 'diff';
+    return true;
+  });
+  return list.sort((a, b) => {
+    const ta = String((a.byKey.get(newestKey(a)) || {}).updated_at || '');
+    const tb = String((b.byKey.get(newestKey(b)) || {}).updated_at || '');
+    return tb.localeCompare(ta);
+  });
+}
+
+function renderList() {
+  if (!state.sources.length) return;
+  const list = filteredRows();
+  const frag = document.createDocumentFragment();
+  $('#listTotal').textContent = state.groups.size;
+  $('#listShown').textContent = list.length;
+  if (!list.length) frag.appendChild(buildEmptyState());
+  for (const row of list) {
+    const sel = state.selection.has(row.id);
+    const r = el('div', 'row' + (sel ? ' sel' : '') + (state.active === row.id ? ' active' : ''));
+    r.dataset.id = row.id;
+
+    const cb = el('div', 'cb');
+    cb.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 12l5 5L20 6"/></svg>';
+    r.appendChild(cb);
+
+    const main = el('div', 'row-main');
+    const tl = el('div', 'row-title');
+    const t = el('span', 't', rowTitle(row));
+    t.title = rowTitle(row);
+    tl.appendChild(t);
+    const kind = rowDiffKind(row);
+    if (kind === 'diff') tl.appendChild(el('span', 'pill diff', '有差异'));
+    if (kind === 'partial') tl.appendChild(el('span', 'pill only', '仅 ' + Array.from(row.byKey.keys()).join('/')));
+    main.appendChild(tl);
+
+    const sub = el('div', 'row-sub');
+    for (const s of state.sources) {
+      const e = row.byKey.get(s.key);
+      const tk = el('span', 'tk');
+      tk.appendChild(el('i', '', s.key));
+      tk.appendChild(el('span', 'mono', e ? String(e.message_count || 0) : '—'));
+      tk.title = e ? (fmtDate(e.updated_at) + ' · ' + (e.message_count || 0) + ' 条') : '此版本无该会话';
+      sub.appendChild(tk);
+    }
+    main.appendChild(sub);
+    r.appendChild(main);
+    frag.appendChild(r);
+  }
+  els.listScroll.replaceChildren(frag);
+  $('#headSel').textContent = state.selection.size;
+  refreshControls(list);
+}
+
+/* ---------- 空状态与按钮可用性 ----------
+ * 列表为空有两种成因：没有共同会话 / 筛选「有差异」但两边内容一致。
+ * 这里写清原因并给一键重置，避免用户卡在空视图里。 */
+const MERGE_FILTER_LABEL = { diff: '有差异' };
+
+function buildEmptyState() {
+  const box = el('div', 'list-empty');
+  if (!state.groups.size) {
+    box.appendChild(el('div', 'le-text', '两个版本没有相同的会话 id，无法对齐'));
+    box.appendChild(el('div', 'le-sub', '只有同一会话 id 才会被视为同一对话的不同版本；请确认两份导出取自同一账号。'));
+    return box;
+  }
+
+  const fl = MERGE_FILTER_LABEL[state.filter] || '';
+  box.appendChild(el('div', 'le-text', fl ? '当前筛选「' + fl + '」下没有会话' : '没有匹配的会话'));
+  const bits = ['共 ' + state.groups.size + ' 组会话'];
+  if (fl) bits.push('当前筛选「' + fl + '」');
+  box.appendChild(el('div', 'le-sub', bits.join(' · ')));
+
+  if (state.filter !== 'all') {
+    const btn = el('button', 'le-reset', '重置筛选，显示全部 ' + state.groups.size + ' 组');
+    btn.type = 'button';
+    btn.addEventListener('click', resetFilters);
+    box.appendChild(btn);
+  }
+  return box;
+}
+
+function resetFilters() {
+  state.filter = 'all';
+  document.querySelectorAll('#filterChips .chip').forEach(b => {
+    b.classList.toggle('on', b.dataset.filter === 'all');
+  });
+  renderList();
+}
+
+/* 各筛选项当前能筛出多少组，用于把「空结果」的筛选项置灰 */
+function filterCounts() {
+  const out = { all: state.groups.size, diff: 0 };
+  for (const row of state.groups.values()) {
+    if (rowDiffKind(row) === 'diff') out.diff++;
+  }
+  return out;
+}
+
+/* 按钮可用性：筛选结果为空时「全选当前 / 反选」不可点；
+ * 一个都没勾选时「清空」不可点；筛不出东西的筛选项置灰
+ *（但正处在该筛选视图时保持可点，避免把自己锁死）。 */
+function refreshControls(list) {
+  const rows = list || (state.sources.length ? filteredRows() : []);
+  const empty = rows.length === 0;
+  const noneSelected = state.selection.size === 0;
+
+  const selAll = $('#selAll');
+  const invert = $('#invert');
+  const clear = $('#clearSel');
+  if (selAll) { selAll.disabled = empty; selAll.title = empty ? '当前筛选结果为空，没有可选的会话' : ''; }
+  if (invert) { invert.disabled = empty; invert.title = empty ? '当前筛选结果为空，没有可反选的会话' : ''; }
+  if (clear) { clear.disabled = noneSelected; clear.title = noneSelected ? '还没有勾选任何会话' : ''; }
+
+  const counts = filterCounts();
+  const noSources = !state.sources.length;
+  document.querySelectorAll('#filterChips .chip').forEach(b => {
+    const f = b.dataset.filter;
+    if (f === 'all') { b.disabled = false; b.title = ''; return; }
+    const locked = counts[f] === 0 && state.filter !== f;
+    b.disabled = locked;
+    let why = '当前两个版本没有差异';
+    if (noSources) why = '还没有载入版本源';
+    else if (state.sources.length < 2) why = '先添加第二个版本源再对比';
+    b.title = locked ? why : '';
+  });
+}
+
+/* ============================================================
+ * 7. 版本载入与差异计算
+ * ============================================================ */
+function newestEntryOf(row) {
+  const k = newestKey(row);
+  return k ? row.byKey.get(k) : null;
+}
+
+async function loadVersions(id) {
+  if (state.cache.has(id)) {
+    const v = state.cache.get(id);
+    state.cache.delete(id); state.cache.set(id, v);
+    return v;
+  }
+  const row = state.groups.get(id);
+  const versions = [];
+  for (const s of state.sources) {
+    const entry = row.byKey.get(s.key);
+    if (!entry) continue;
+    let session;
+    try {
+      session = JSON.parse(await s.source.readText('chat_sessions/' + id + '.json'));
+    } catch (e) {
+      toast('版本 ' + s.key + ' 的会话 JSON 无法解析，已跳过', 'warn');
+      continue;
+    }
+    versions.push({ key: s.key, label: s.label, entry, session });
+  }
+  // 两份导出的消息 id 可能被重排过（删消息后整体前移），先归一化再对齐
+  try {
+    if (canonicalizeVersions(versions) && !state.realignedHint) {
+      state.realignedHint = true;
+      toast('检测到两份导出的消息 id 不一致，已按正文顺序重新对齐', 'warn', 7000);
+    }
+  } catch (e) {
+    console.warn('版本对齐失败，退回按 id 对齐', e);
+  }
+  state.cache.set(id, versions);
+  if (state.cache.size > 6) state.cache.delete(state.cache.keys().next().value);
+  return versions;
+}
+
+function diffVersions(versions) {
+  const byId = new Map();
+  for (const v of versions) {
+    const msgs = Array.isArray(v.session.messages) ? v.session.messages : [];
+    for (const m of msgs) {
+      if (!m || m.id == null) continue;
+      if (!byId.has(m.id)) byId.set(m.id, new Map());
+      byId.get(m.id).set(v.key, m);
+    }
+  }
+  const rows = [];
+  for (const [id, map] of byId) {
+    const keys = Array.from(map.keys());
+    const sigs = new Set(keys.map(k => msgSig(map.get(k))));
+    let status = 'same';
+    if (sigs.size > 1) status = 'conflict';
+    else if (keys.length < versions.length) status = 'single';
+    rows.push({ id, map, keys, status });
+  }
+  rows.sort((a, b) => Number(a.id) - Number(b.id));
+
+  // 叶子节点（可作为 head）
+  const parentIds = new Set();
+  for (const [, map] of byId) {
+    for (const [, m] of map) if (m && m.parent_id != null) parentIds.add(m.parent_id);
+  }
+  const leaves = [];
+  for (const [id] of byId) if (!parentIds.has(id)) leaves.push(id);
+  leaves.sort((a, b) => Number(b) - Number(a));
+  return { rows, leaves };
+}
+
+async function openSession(id) {
+  state.active = id;
+  els.mergePanel.classList.add('open');
+  document.querySelectorAll('.row').forEach(r => r.classList.toggle('active', r.dataset.id === id));
+  els.mergeEmpty.style.display = 'none';
+  els.mergeBody.style.display = 'block';
+  els.mergeBody.replaceChildren(el('div', 'merge-empty', '载入版本中…'));
+  try {
+    const versions = await loadVersions(id);
+    if (state.active !== id) return;
+    if (!versions.length) {
+      els.mergeBody.replaceChildren(el('div', 'merge-empty', '两个版本都读不到这个会话的正文'));
+      return;
+    }
+    const diff = diffVersions(versions);
+    const newest = versions.slice().sort((a, b) => String(b.entry.updated_at || '').localeCompare(String(a.entry.updated_at || '')))[0];
+    const choices = new Map();
+    for (const r of diff.rows) {
+      if (r.status === 'conflict') {
+        const pick = r.map.has(newest.key) ? newest.key : r.keys.slice().sort((a, b) => versionTs(versions, b).localeCompare(versionTs(versions, a)))[0];
+        choices.set(r.id, pick);
+      }
+    }
+    const headDefault = diff.leaves.includes(newest.session.current_message_id) ? newest.session.current_message_id : diff.leaves[0];
+    state.loaded = {
+      id, versions, rows: diff.rows, leaves: diff.leaves,
+      choices, head: headDefault,
+      headTouched: false, conflictOnly: true,
+    };
+    renderMerge();
+  } catch (err) {
+    els.mergeBody.replaceChildren(el('div', 'merge-empty', '读取失败：' + err.message));
+  }
+}
+
+function versionTs(versions, key) {
+  const v = versions.find(x => x.key === key);
+  return v ? String(v.entry.updated_at || '') : '';
+}
+
+/* ============================================================
+ * 8. 合并面板
+ * ============================================================ */
+function fragmentText(f) {
+  if (!f || typeof f !== 'object') return '';
+  switch (f.type) {
+    case 'REQUEST':
+    case 'RESPONSE':
+    case 'TEMPLATE_RESPONSE':
+      return String(f.content == null ? '' : f.content);
+    case 'THINK':
+      return '[思考] ' + String(f.content == null ? '' : f.content);
+    case 'FILE':
+      return '[附件 ' + ((f.files || []).length) + ']';
+    case 'TOOL_SEARCH':
+      return '[联网搜索] ' + (f.queries || []).join(' / ');
+    case 'READ_LINK':
+    case 'TOOL_OPEN':
+    case 'TOOL_FIND':
+      return '[工具] ' + (f.url || f.pattern || f.type);
+    case 'CONTENT_RISK':
+    case 'TIP':
+      return '[提示] ' + String(f.content == null ? '' : f.content);
+    default:
+      return '';
+  }
+}
+function messageText(m) {
+  if (!m) return '';
+  return (m.fragments || []).map(fragmentText).filter(Boolean).join('\n');
+}
+function snippet(text, n) {
+  const s = String(text || '').replace(/\s+/g, ' ').trim();
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
+function renderMerge() {
+  const L = state.loaded;
+  if (!L) return;
+  const box = els.mergeBody;
+  box.replaceChildren();
+  box.style.display = 'flex';
+  box.style.flexDirection = 'column';
+  box.style.minHeight = '0';
+
+  const head = el('div', 'merge-head');
+  const top = el('div', 'mh-top');
+  top.appendChild(el('div', 'mh-title', rowTitle(state.groups.get(L.id))));
+  head.appendChild(top);
+
+  const meta = el('div', 'mh-meta');
+  for (const v of L.versions) {
+    meta.appendChild(el('span', 'pill', v.key + ' · ' + fmtDate(v.entry.updated_at) + ' · ' + (v.session.messages || []).length + ' 条'));
+  }
+  head.appendChild(meta);
+
+  const headRow = el('div', 'mh-head-row');
+  headRow.appendChild(el('label', '', '当前分支（head）'));
+  const sel = document.createElement('select');
+  for (const leafId of L.leaves) {
+    const row = L.rows.find(r => String(r.id) === String(leafId));
+    const msg = row ? row.map.get(L.choices.get(row.id) || row.keys[0]) : null;
+    const opt = document.createElement('option');
+    opt.value = String(leafId);
+    opt.textContent = '#' + leafId + (msg ? ' · ' + (msg.role === 'USER' ? '用户' : '助手') + ' · ' + snippet(messageText(msg), 24) : '');
+    if (String(leafId) === String(L.head)) opt.selected = true;
+    sel.appendChild(opt);
+  }
+  sel.addEventListener('change', () => {
+    L.head = Number(sel.value);
+    L.headTouched = true;
+    updateStats();
+    validateSelection();
+  });
+  headRow.appendChild(sel);
+  headRow.appendChild(el('span', 'hint', L.leaves.length > 1 ? '该会话有 ' + L.leaves.length + ' 个分支末端，其他分支仍会保留' : '单分支'));
+  head.appendChild(headRow);
+  box.appendChild(head);
+
+  const conflictRows = L.rows.filter(r => r.status === 'conflict');
+  const singleRows = L.rows.filter(r => r.status === 'single');
+  const sameCount = L.rows.length - conflictRows.length - singleRows.length;
+
+  const actions = el('div', 'merge-actions');
+  const seg = el('div', 'seg');
+  const bAll = el('button', L.conflictOnly ? '' : 'on', '全部 ' + L.rows.length);
+  const bConf = el('button', L.conflictOnly ? 'on' : '', '冲突 ' + conflictRows.length + (pendingCount() ? '（待定 ' + pendingCount() + '）' : ''));
+  bAll.addEventListener('click', () => { L.conflictOnly = false; renderMerge(); });
+  bConf.addEventListener('click', () => { L.conflictOnly = true; renderMerge(); });
+  seg.appendChild(bAll); seg.appendChild(bConf);
+  actions.appendChild(seg);
+
+  const bNew = el('button', 'tool-link', '冲突全取新版');
+  bNew.addEventListener('click', () => { for (const r of conflictRows) L.choices.set(r.id, pickNewest(r)); renderMerge(); updateStats(); });
+  const bOld = el('button', 'tool-link', '冲突全取旧版');
+  bOld.addEventListener('click', () => { for (const r of conflictRows) L.choices.set(r.id, pickOldest(r)); renderMerge(); updateStats(); });
+  actions.appendChild(bNew);
+  actions.appendChild(bOld);
+  actions.appendChild(el('span', 'hint', '仅一侧 ' + singleRows.length + ' · 完全一致 ' + sameCount));
+  box.appendChild(actions);
+
+  const scroll = el('div', 'merge-scroll');
+  box.appendChild(scroll);   // 先挂载：即使某一行渲染失败，已渲染的部分也不会整片消失
+  const showRows = L.conflictOnly ? conflictRows : L.rows.filter(r => r.status !== 'same');
+  if (!showRows.length) {
+    scroll.appendChild(el('div', 'list-empty', conflictRows.length ? '没有需要选择的冲突' : '两个版本完全一致，可直接导出'));
+  }
+  const failed = [];
+  let rendered = 0;
+  for (const row of showRows) {
+    try { scroll.appendChild(renderDiffRow(row)); rendered++; }
+    catch (err) {
+      failed.push('#' + row.id + ' ' + ((err && err.message) || err));
+      console.error('差异行渲染失败', row.id, err);
+    }
+  }
+  try {
+    if (conflictRows.length && L.conflictOnly) scroll.appendChild(renderAutoBox(L));
+    else if (!L.conflictOnly) scroll.appendChild(renderAutoBox(L));
+  } catch (err) {
+    failed.push('自动合并项 ' + ((err && err.message) || err));
+    console.error('自动合并项渲染失败', err);
+  }
+  if (failed.length) {
+    const warnBox = el('div', 'list-empty');
+    warnBox.appendChild(el('div', 'le-text', '有 ' + failed.length + ' 行渲染失败，其余已正常显示'));
+    warnBox.appendChild(el('div', 'le-sub', failed.slice(0, 3).join('；')));
+    scroll.appendChild(warnBox);
+  }
+  // 兜底：行确实生成了却看不见（窗口过矮时差异区会被挤成 0 高度）
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(() => {
+      if (!rendered) return;
+      let h = 0;
+      try { h = scroll.getBoundingClientRect().height; } catch (e) { return; }
+      if (h < 2) {
+        const warn = el('span', 'hint');
+        warn.style.color = 'var(--warn)';
+        warn.textContent = '差异区被挤成 0 高度：窗口太矮，拉高窗口或按 F11 全屏后重开会话';
+        actions.appendChild(warn);
+      }
+    });
+  }
+}
+
+function pendingCount() {
+  const L = state.loaded;
+  if (!L) return 0;
+  return L.rows.filter(r => r.status === 'conflict' && !L.choices.has(r.id)).length;
+}
+
+function pickNewest(row) {
+  const L = state.loaded;
+  let best = row.keys[0];
+  let bestTs = '';
+  for (const k of row.keys) {
+    const ts = versionTs(L.versions, k);
+    if (!bestTs || ts > bestTs) { best = k; bestTs = ts; }
+  }
+  return best;
+}
+function pickOldest(row) {
+  const L = state.loaded;
+  let best = row.keys[0];
+  let bestTs = '';
+  for (const k of row.keys) {
+    const ts = versionTs(L.versions, k);
+    if (!bestTs || ts < bestTs) { best = k; bestTs = ts; }
+  }
+  return best;
+}
+
+function renderDiffRow(row) {
+  const L = state.loaded;
+  const isConflict = row.status === 'conflict';
+  const chosen = L.choices.get(row.id) || pickNewest(row);
+  const wrap = el('div', 'diff-row' + (isConflict ? (L.choices.has(row.id) ? ' resolved' : ' conflict') : ''));
+  const head = el('div', 'dr-head');
+  head.appendChild(el('b', '', '#' + row.id));
+  const sample = row.map.get(chosen) || row.map.get(row.keys[0]);
+  head.appendChild(el('span', '', sample && sample.role === 'USER' ? '用户' : '助手'));
+  if (isConflict) {
+    const tag = el('span', 'tag' + (L.choices.has(row.id) ? ' ok' : ''), L.choices.has(row.id) ? '已选择 ' + chosen : '冲突 · 待选择');
+    head.appendChild(tag);
+  } else {
+    head.appendChild(el('span', 'tag ok', '仅 ' + row.keys.join('/') + ' 有此消息 · 自动保留'));
+  }
+  head.appendChild(el('span', 'hint', 'parent #' + (sample && sample.parent_id != null ? sample.parent_id : '无')));
+  wrap.appendChild(head);
+
+  if (isConflict) {
+    const body = el('div', 'dr-body');
+    body.style.gridTemplateColumns = 'repeat(' + row.keys.length + ',minmax(0,1fr))';
+    for (const key of row.keys) {
+      const msg = row.map.get(key);
+      const col = document.createElement('label');
+      col.className = 'col' + (chosen === key ? ' on' : '');
+      const radio = document.createElement('input');
+      radio.type = 'radio';
+      radio.name = 'msg-' + row.id;
+      radio.checked = chosen === key;
+      radio.addEventListener('change', () => {
+        L.choices.set(row.id, key);
+        renderMerge();
+        updateStats();
+        validateSelection();
+      });
+      col.appendChild(radio);
+      const cbody = el('div', 'cbody');
+      const chead = el('div', 'chead');
+      chead.appendChild(el('span', 'k', key));
+      chead.appendChild(el('span', '', fmtDate(versionTs(L.versions, key))));
+      cbody.appendChild(chead);
+      const text = messageText(msg);
+      cbody.appendChild(el('p', '', snippet(text, 220)));
+      if (text.length > 220) {
+        const d = document.createElement('details');
+        const s = document.createElement('summary');
+        s.textContent = '展开全文';
+        const pre = el('pre', '', text);
+        d.appendChild(s); d.appendChild(pre);
+        cbody.appendChild(d);
+      }
+      col.appendChild(cbody);
+      body.appendChild(col);
+    }
+    wrap.appendChild(body);
+  } else {
+    const body = el('div', 'dr-body');
+    body.appendChild(el('p', 'hint', snippet(messageText(row.map.get(row.keys[0])), 180)));
+    wrap.appendChild(body);
+  }
+  return wrap;
+}
+
+function renderAutoBox(L) {
+  const singleRows = L.rows.filter(r => r.status === 'single');
+  const sameRows = L.rows.filter(r => r.status === 'same');
+  const d = document.createElement('details');
+  d.className = 'auto-box';
+  const s = document.createElement('summary');
+  s.textContent = '自动合并项 · 仅一侧 ' + singleRows.length + ' 条 · 完全一致 ' + sameRows.length + ' 条（点击展开）';
+  d.appendChild(s);
+  const list = el('div', 'auto-list');
+  for (const row of singleRows) {
+    const line = el('div', 'auto-line');
+    line.appendChild(el('b', '', '#' + row.id));
+    line.appendChild(el('span', 'pill only', '仅 ' + row.keys.join('/')));
+    line.appendChild(el('span', 'txt', snippet(messageText(row.map.get(row.keys[0])), 80)));
+    list.appendChild(line);
+  }
+  for (const row of sameRows) {
+    const line = el('div', 'auto-line');
+    line.appendChild(el('b', '', '#' + row.id));
+    line.appendChild(el('span', 'pill', '一致'));
+    line.appendChild(el('span', 'txt', snippet(messageText(row.map.get(row.keys[0])), 80)));
+    list.appendChild(line);
+  }
+  if (!singleRows.length && !sameRows.length) list.appendChild(el('div', 'hint', '没有自动合并项'));
+  d.appendChild(list);
+  return d;
+}
+
+/* ============================================================
+ * 9. 合并结果
+ * ============================================================ */
+async function mergedSession(id) {
+  const row = state.groups.get(id);
+  if (!row) throw new Error('会话不存在：' + id);
+  const versions = await loadVersions(id);
+  if (!versions.length) throw new Error('无法读取会话 ' + id);
+  const diff = diffVersions(versions);
+  const L = state.loaded && state.loaded.id === id ? state.loaded : null;
+
+  const messages = [];
+  for (const r of diff.rows) {
+    let key;
+    if (r.status === 'conflict') {
+      key = (L && L.choices.get(r.id)) || defaultConflictPick(r, versions);
+    } else {
+      key = r.keys.slice().sort((a, b) => versionTs(versions, b).localeCompare(versionTs(versions, a)))[0];
+    }
+    messages.push(r.map.get(key));
+  }
+  messages.sort((a, b) => Number(a.id) - Number(b.id));
+
+  const newest = versions.slice().sort((a, b) => String(b.entry.updated_at || '').localeCompare(String(a.entry.updated_at || '')))[0];
+  const ids = new Set(messages.map(m => m.id));
+  let head;
+  if (L && L.headTouched && ids.has(L.head)) head = L.head;
+  else if (ids.has(newest.session.current_message_id)) head = newest.session.current_message_id;
+  else head = diff.leaves.find(x => ids.has(x));
+  if (head == null) throw new Error('无法确定会话 ' + id + ' 的当前分支');
+
+  const stamps = versions.map(v => String(v.entry.inserted_at || '')).filter(Boolean).sort();
+  const upd = versions.map(v => String(v.entry.updated_at || '')).filter(Boolean).sort();
+  const title = versions.map(v => v.session.title || v.entry.title).find(t => t) || null;
+
+  return {
+    id,
+    title,
+    pinned: false,
+    current_message_id: head,
+    inserted_at: stamps[0] || newest.session.inserted_at,
+    updated_at: upd[upd.length - 1] || newest.session.updated_at,
+    messages,
+  };
+}
+
+function defaultConflictPick(row, versions) {
+  let best = row.keys[0];
+  let bestTs = '';
+  for (const k of row.keys) {
+    const ts = versionTs(versions, k);
+    if (!bestTs || ts > bestTs) { best = k; bestTs = ts; }
+  }
+  return best;
+}
+
+/* ============================================================
+ * 10. demo 兼容校验
+ * ============================================================ */
+const ISO_RE = /^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(?:\.(\d+))?Z$/;
+const STATUSES = new Set(['WIP', 'FINISHED', 'CONTENT_FILTER', 'FAILED', 'INCOMPLETE', 'CONTEXT_LENGTH_EXCEEDED', 'TIMEOUT']);
+const ROLES = new Set(['USER', 'ASSISTANT']);
+function isDemoTs(v) {
+  if (typeof v !== 'string') return false;
+  const m = ISO_RE.exec(v);
+  if (!m) return false;
+  const padded = m[1] + '.' + (m[2] || '').padEnd(3, '0').slice(0, 3) + 'Z';
+  const d = new Date(padded);
+  if (isNaN(d.getTime())) return false;
+  return d.toISOString() === padded;
+}
+function checkSession(session, label) {
+  const errors = [];
+  const warnings = [];
+  if (!session || typeof session !== 'object') return { errors: [label + ' 正文格式异常'], warnings };
+  if (!isDemoTs(session.inserted_at) || !isDemoTs(session.updated_at)) errors.push(label + ' 的时间戳不被 demo 接受');
+  const messages = Array.isArray(session.messages) ? session.messages : [];
+  if (!Array.isArray(session.messages)) errors.push(label + ' 缺少 messages 数组');
+  const ids = new Set(messages.map(m => m && m.id));
+  if (messages.length && !ids.has(session.current_message_id)) errors.push(label + ' 的 current_message_id 不在消息中');
+  for (const m of messages) {
+    if (!m || typeof m !== 'object') { errors.push(label + ' 存在非法消息'); continue; }
+    if (!ROLES.has(m.role)) errors.push(label + ' 消息 #' + m.id + ' role 非法');
+    if (!STATUSES.has(m.status)) errors.push(label + ' 消息 #' + m.id + ' status 非法');
+    if (m.parent_id != null && !ids.has(m.parent_id)) errors.push(label + ' 消息 #' + m.id + ' parent_id 缺失');
+    if (!isDemoTs(m.inserted_at)) warnings.push(label + ' 消息 #' + m.id + ' 时间格式异常');
+  }
+  return { errors, warnings };
+}
+
+function invalidateResult() {
+  if (!state.result) return;
+  URL.revokeObjectURL(state.result.url);
+  state.result = null;
+  els.linkDemo.style.display = 'none';
+  resetGenButton();
+}
+
+function selectionSig() {
+  const L = state.loaded;
+  const picked = L && L.choices
+    ? Array.from(L.choices).sort((a, b) => Number(a[0]) - Number(b[0])).map(([k, v]) => k + ':' + v).join(',')
+    : '';
+  const lhead = L && L.headTouched ? L.id + '#' + L.head : '';
+  return state.sources.map(s => s.key).join(',') + '|' + Array.from(state.selection).sort().join(',') + '|' + picked + '|' + lhead;
+}
+
+async function validateSelection() {
+  // 选择或版本源变化后，之前生成的包已不代表当前选择
+  if (state.result && state.result.sig !== selectionSig()) invalidateResult();
+  const errors = [];
+  const warnings = [];
+  if (!state.sources.length) {
+    state.validation = { errors: [], warnings: [] };
+    updateValidationUI();
+    return state.validation;
+  }
+  if (state.sources.length < 2) warnings.push('只载入了一个版本源，合并结果等同于该版本');
+  if (!state.selection.size) errors.push('还没有选择要导出的会话');
+  if (state.selection.size > 150) warnings.push('已选 ' + state.selection.size + ' 组，导出需要解析全部版本，可能耗时较长');
+  for (const id of state.selection) {
+    const row = state.groups.get(id);
+    if (!row) continue;
+    for (const [k, entry] of row.byKey) {
+      if (!isDemoTs(entry.inserted_at) || !isDemoTs(entry.updated_at)) {
+        warnings.push('版本 ' + k + ' 的索引时间格式异常：' + (entry.title || id));
+        break;
+      }
+    }
+  }
+  state.validation = { errors, warnings };
+  updateValidationUI();
+  return state.validation;
+}
+
+function updateValidationUI() {
+  const box = els.valState;
+  const L = s => (window.DS_I18N ? DS_I18N.t(s) : s);
+  box.classList.remove('ok', 'warn', 'err');
+  els.btnSelftest.disabled = !state.sources.length || state.generating;
+  if (state.result) {
+    box.classList.add('ok');
+    els.valText.textContent = L('已生成 ' + state.result.name + '（' + bytesText(state.result.blob.size) + '）');
+    els.valMore.style.display = 'none';
+    els.btnGen.disabled = false;
+    return;
+  }
+  const { errors, warnings } = state.validation;
+  const ready = state.sources.length >= 1 && state.selection.size > 0;
+  if (errors.length) {
+    box.classList.add('err');
+    els.valText.textContent = L(errors.length + ' 个问题需要处理');
+    els.valMore.style.display = 'inline';
+  } else if (warnings.length) {
+    box.classList.add('warn');
+    els.valText.textContent = L(ready ? '可以导出，' + warnings.length + ' 项提醒' : '等待载入版本源');
+    els.valMore.style.display = 'inline';
+  } else if (ready) {
+    box.classList.add('ok');
+    els.valText.textContent = L(state.sources.length < 2 ? '单版本导出' : '可以合并导出');
+    els.valMore.style.display = 'none';
+  } else {
+    els.valText.textContent = L('尚未载入版本源');
+    els.valMore.style.display = 'none';
+  }
+  els.btnGen.disabled = state.generating ? false : (!ready || errors.length > 0);
+}
+
+function showDetails() {
+  const { errors, warnings } = state.validation;
+  const L = s => (window.DS_I18N ? DS_I18N.t(s) : s);
+  $('#dlgTitle').textContent = L('校验明细');
+  const box = $('#dlgBody');
+  box.replaceChildren();
+  if (!errors.length && !warnings.length) box.appendChild(el('p', '', L('没有发现问题。')));
+  if (errors.length) {
+    box.appendChild(el('p', '', L('错误（阻止导出）：')));
+    const ul = el('ul', 'err-list');
+    errors.forEach(e => ul.appendChild(el('li', 'e', L(e))));
+    box.appendChild(ul);
+  }
+  if (warnings.length) {
+    box.appendChild(el('p', '', L('提醒（可继续）：')));
+    const ul = el('ul', 'err-list');
+    warnings.forEach(w => ul.appendChild(el('li', 'w', L(w))));
+    box.appendChild(ul);
+  }
+  $('#detailDlg').showModal();
+}
+
+/* ============================================================
+ * 11. 打包
+ * ============================================================ */
+async function buildZip(entries, onProgress, token) {
+  if (entries.length >= 0xFFFF) throw new Error('条目过多（' + entries.length + '），超出 demo 支持范围');
+  const parts = [];
+  const central = [];
+  let offset = 0;
+  for (let i = 0; i < entries.length; i++) {
+    if (token && token.cancelled) throw new Error('CANCELLED');
+    const it = entries[i];
+    if (!isAsciiName(it.name)) throw new Error('条目名含非 ASCII 字符：' + it.name);
+    const nameBytes = ENC.encode(it.name);
+    const raw = it.bytes;
+    let data = raw;
+    let method = 0;
+    if (it.compress) {
+      const z = await deflateRaw(raw);
+      if (z && z.length < raw.length) { data = z; method = 8; }
+    }
+    if (raw.length >= 0xFFFFFFFF || data.length >= 0xFFFFFFFF) throw new Error('单文件超过 4GB，不支持');
+    const crc = crc32(raw);
+    const head = new Uint8Array(30 + nameBytes.length);
+    const dv = new DataView(head.buffer);
+    dv.setUint32(0, 0x04034B50, true);
+    dv.setUint16(4, 20, true);
+    dv.setUint16(6, 0, true);
+    dv.setUint16(8, method, true);
+    dv.setUint16(10, 0, true);
+    dv.setUint16(12, 0x21, true);
+    dv.setUint32(14, crc, true);
+    dv.setUint32(18, data.length, true);
+    dv.setUint32(22, raw.length, true);
+    dv.setUint16(26, nameBytes.length, true);
+    dv.setUint16(28, 0, true);
+    head.set(nameBytes, 30);
+    parts.push(head, data);
+    central.push({ nameBytes, method, crc, csize: data.length, usize: raw.length, offset });
+    offset += head.length + data.length;
+    if (onProgress) await onProgress((i + 1) / entries.length);
+    if ((i & 7) === 0) await raf();
+  }
+  const cdStart = offset;
+  let cdSize = 0;
+  for (const c of central) {
+    const head = new Uint8Array(46 + c.nameBytes.length);
+    const dv = new DataView(head.buffer);
+    dv.setUint32(0, 0x02014B50, true);
+    dv.setUint16(4, 20, true);
+    dv.setUint16(6, 20, true);
+    dv.setUint16(8, 0, true);
+    dv.setUint16(10, c.method, true);
+    dv.setUint16(12, 0, true);
+    dv.setUint16(14, 0x21, true);
+    dv.setUint32(16, c.crc, true);
+    dv.setUint32(20, c.csize, true);
+    dv.setUint32(24, c.usize, true);
+    dv.setUint16(28, c.nameBytes.length, true);
+    dv.setUint16(30, 0, true);
+    dv.setUint16(32, 0, true);
+    dv.setUint16(34, 0, true);
+    dv.setUint16(36, 0, true);
+    dv.setUint32(38, 0, true);
+    dv.setUint32(42, c.offset, true);
+    head.set(c.nameBytes, 46);
+    parts.push(head);
+    cdSize += head.length;
+  }
+  if (cdStart + cdSize >= 0xFFFFFFFF) throw new Error('生成包超过 4GB，不支持');
+  const eocd = new Uint8Array(22);
+  const ev = new DataView(eocd.buffer);
+  ev.setUint32(0, 0x06054B50, true);
+  ev.setUint16(8, central.length, true);
+  ev.setUint16(10, central.length, true);
+  ev.setUint32(12, cdSize, true);
+  ev.setUint32(16, cdStart, true);
+  parts.push(eocd);
+  return new Blob(parts, { type: 'application/zip' });
+}
+
+async function selfCheck(blob, expectIds) {
+  const problems = [];
+  const zip = await parseZip(blob);
+  const names = Array.from(zip.entries.keys());
+  if (!names.length) problems.push('包内没有任何条目');
+  if (names[0] !== 'manifest.json') problems.push('首条目不是 manifest.json');
+  const idxPos = names.indexOf('chat_session_index.json');
+  const sessionNames = names.filter(n => /^chat_sessions\/[^/]+\.json$/.test(n));
+  const imgNames = names.filter(n => n.includes('_files/'));
+  if (idxPos < 0) problems.push('缺少 chat_session_index.json');
+  if (names.includes('user.json') && sessionNames.length && names.indexOf('user.json') > names.indexOf(sessionNames[0])) {
+    problems.push('user.json 未排在会话之前');
+  }
+  if (idxPos >= 0) {
+    sessionNames.forEach(n => { if (names.indexOf(n) > idxPos) problems.push('会话排在索引之后：' + n); });
+    imgNames.forEach(n => { if (names.indexOf(n) < idxPos) problems.push('附件排在索引之前：' + n); });
+  }
+  const index = JSON.parse(DEC.decode(await readZipEntry(zip, zip.entries.get('chat_session_index.json'))));
+  const indexIds = new Set(index.map(e => e.id));
+  if (indexIds.size !== index.length) problems.push('索引存在重复 id');
+  if (indexIds.size !== sessionNames.length) problems.push('索引与包内会话数量不一致');
+  if (expectIds && expectIds.length !== indexIds.size) problems.push('导出的会话数量与选择不一致');
+  const missing = Array.from(indexIds).filter(id => !zip.entries.has('chat_sessions/' + id + '.json'));
+  if (missing.length) problems.push('索引中有会话缺少正文：' + missing.slice(0, 3).join(', '));
+  for (const [name, meta] of zip.entries) {
+    const bytes = await readZipEntry(zip, meta);
+    if (crc32(bytes) !== meta.crc) problems.push('CRC 校验失败：' + name);
+  }
+  return problems;
+}
+
+/* ============================================================
+ * 12. 导出
+ * ============================================================ */
+function setGenProgress(pct, label) {
+  els.genBar.style.width = Math.round(pct * 100) + '%';
+  if (label != null) els.genLabel.textContent = window.DS_I18N ? DS_I18N.t(label) : label;
+}
+
+function resetGenButton() {
+  els.btnGen.classList.remove('done');
+  els.btnGen.innerHTML = '<span id="genLabel">合并并导出 ZIP</span><span class="bar" id="genBar" style="width:0"></span>';
+  els.genLabel = $('#genLabel');
+  els.genBar = $('#genBar');
+}
+
+async function generate() {
+  if (state.generating) { if (state.cancelToken) state.cancelToken.cancelled = true; return; }
+  await validateSelection();
+  if (state.validation.errors.length) { showDetails(); toast('还有问题需要处理', 'err'); return; }
+  if (!state.selection.size) return;
+
+  state.generating = true;
+  state.cancelToken = { cancelled: false };
+  els.btnGen.classList.remove('done');
+  els.btnGen.innerHTML = '<span class="ring"></span><span id="genLabel">准备中…</span><span class="bar" id="genBar" style="width:0"></span>';
+  els.genLabel = $('#genLabel'); els.genBar = $('#genBar');
+
+  try {
+    const ids = Array.from(state.selection);
+    const merged = [];
+    const errors = [];
+    const warnings = [];
+    for (let i = 0; i < ids.length; i++) {
+      if (state.cancelToken.cancelled) throw new Error('CANCELLED');
+      setGenProgress((i + 1) / (ids.length * 2), '合并中 ' + (i + 1) + '/' + ids.length);
+      const s = await mergedSession(ids[i]);
+      const label = '「' + (s.title || s.id) + '」';
+      const chk = checkSession(s, label);
+      errors.push(...chk.errors);
+      warnings.push(...chk.warnings);
+      merged.push(s);
+      if ((i & 3) === 0) await raf();
+    }
+    if (errors.length) {
+      state.validation = { errors: errors.slice(0, 40), warnings: warnings.slice(0, 40) };
+      updateValidationUI();
+      showDetails();
+      throw new Error('合并结果有 ' + errors.length + ' 个 demo 兼容性问题');
+    }
+
+    const entries = [];
+    entries.push({ name: 'manifest.json', bytes: ENC.encode('{"export_format_version":3}'), compress: true });
+    if (state.includeUser) {
+      const withUser = state.sources.find(s => s.source.has('user.json'));
+      if (withUser) entries.push({ name: 'user.json', bytes: await withUser.source.readBytes('user.json'), compress: true });
+    }
+
+    const indexEntries = [];
+    for (const s of merged) {
+      indexEntries.push({
+        id: s.id,
+        title: s.title,
+        pinned: false,
+        message_count: s.messages.length,
+        inserted_at: s.inserted_at,
+        updated_at: s.updated_at,
+      });
+      entries.push({ name: 'chat_sessions/' + s.id + '.json', bytes: ENC.encode(JSON.stringify(s)), compress: true });
+    }
+    entries.push({ name: 'chat_session_index.json', bytes: ENC.encode(JSON.stringify(indexEntries)), compress: true });
+
+    // 附件并集：同路径优先取较新版本
+    let step = 0;
+    for (const s of merged) {
+      const prefix = 'chat_sessions/' + s.id + '_files/';
+      const seen = new Set();
+      const ordered = state.sources.slice().sort((a, b) => {
+        const ea = state.groups.get(s.id).byKey.get(a.key);
+        const eb = state.groups.get(s.id).byKey.get(b.key);
+        return String((eb && eb.updated_at) || '').localeCompare(String((ea && ea.updated_at) || ''));
+      });
+      for (const src of ordered) {
+        for (const name of src.source.filesUnder(prefix)) {
+          if (seen.has(name)) continue;
+          seen.add(name);
+          entries.push({ name, bytes: await src.source.readBytes(name), compress: false });
+        }
+      }
+      step++;
+      if ((step & 3) === 0) await raf();
+    }
+
+    const blob = await buildZip(entries, async p => {
+      setGenProgress(0.5 + p * 0.35, '打包中 ' + Math.round(p * 100) + '%');
+    }, state.cancelToken);
+
+    setGenProgress(0.9, '自检中…');
+    const problems = await selfCheck(blob, ids);
+    if (problems.length) throw new Error('自检未通过：' + problems.slice(0, 3).join('；'));
+
+    const d = new Date();
+    const p2 = n => String(n).padStart(2, '0');
+    const fname = 'deepseek_merged_' + d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + '_' + p2(d.getHours()) + p2(d.getMinutes()) + '.zip';
+    if (state.result && state.result.url) URL.revokeObjectURL(state.result.url);
+    state.result = { url: URL.createObjectURL(blob), blob, name: fname, sig: selectionSig() };
+    els.btnGen.classList.add('done');
+    els.btnGen.innerHTML = '<span id="genLabel">下载 ZIP · ' + bytesText(blob.size) + '</span>';
+    els.genLabel = $('#genLabel');
+    els.linkDemo.style.display = 'inline-flex';
+    toast('已生成 ' + fname + '（' + bytesText(blob.size) + '）', 'ok', 6000);
+    toast('包内含完整对话，请谨慎分享', 'warn', 7000);
+  } catch (err) {
+    if (err && err.message === 'CANCELLED') toast('已取消', 'warn');
+    else { console.error(err); toast('导出失败：' + (err && err.message ? err.message : err), 'err', 8000); }
+    resetGenButton();
+  } finally {
+    state.generating = false;
+    state.cancelToken = null;
+    updateValidationUI();
+  }
+}
+
+function downloadResult() {
+  if (!state.result) return;
+  const a = document.createElement('a');
+  a.href = state.result.url;
+  a.download = state.result.name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  toast('已开始下载，可在 chat-demo 中导入验证', 'ok', 5000);
+}
+
+/* ============================================================
+ * 13. 统计与渲染
+ * ============================================================ */
+function updateStats() {
+  $('#statGroups').textContent = state.groups.size;
+  $('#statSel').textContent = state.selection.size;
+  const L = state.loaded;
+  const conf = L ? L.rows.filter(r => r.status === 'conflict').length : 0;
+  const pend = L ? pendingCount() : 0;
+  $('#statConf').textContent = L ? conf + (pend ? ' (' + pend + ')' : '') : '0';
+  $('#headSel').textContent = state.selection.size;
+  refreshControls();
+
+  const parts = [];
+  if (state.sources.length) parts.push(el('span', '', '版本 ' + state.sources.map(s => s.key).join(' / ')));
+  if (state.selection.size) {
+    const p = el('span', '');
+    p.appendChild(document.createTextNode('导出 '));
+    p.appendChild(el('b', '', String(state.selection.size)));
+    p.appendChild(document.createTextNode(' 组'));
+    parts.push(p);
+  }
+  if (L) parts.push(el('span', '', '当前会话 ' + L.rows.length + ' 条消息 · 冲突 ' + conf));
+  els.exportMid.replaceChildren();
+  if (!parts.length) {
+    els.exportMid.textContent = '载入至少两个版本源后可合并导出';
+  } else {
+    parts.forEach((node, i) => {
+      if (i) els.exportMid.appendChild(document.createTextNode(' · '));
+      els.exportMid.appendChild(node);
+    });
+  }
+  $('#statHint').textContent = !state.sources.length
+    ? '先添加两个不同日期的导出包。'
+    : (L ? '逐条选择冲突；未打开的会话按「取较新版本」自动合并。' : '选择左侧会话，逐条决定冲突保留哪一版。');
+}
+
+function renderSources() {
+  const chips = $('#srcChips');
+  const list = $('#srcList');
+  chips.replaceChildren();
+  list.replaceChildren();
+  if (!state.sources.length) {
+    chips.appendChild(el('span', 'src-empty', '尚未载入版本源 · 建议载入 2 个不同日期的导出包'));
+    list.appendChild(el('div', 'hint', '未载入。点击右上「添加文件夹 / 添加 ZIP」，或把导出包拖进页面。'));
+    return;
+  }
+  for (const s of state.sources) {
+    const chip = el('div', 'src-chip');
+    chip.appendChild(el('span', 'k', s.key));
+    const n = el('span', 'n', s.label);
+    n.title = s.label;
+    chip.appendChild(n);
+    chip.appendChild(el('span', 'c', s.index.length + ' 组'));
+    const x = el('button', 'x', '×');
+    x.title = '移除该版本';
+    x.addEventListener('click', () => removeSource(s.key));
+    chip.appendChild(x);
+    chips.appendChild(chip);
+
+    const item = el('div', 'src-item');
+    item.appendChild(el('span', 'k', s.key));
+    const meta = el('div', 'meta');
+    meta.appendChild(el('div', 'nm', s.label));
+    meta.appendChild(el('div', 'sub', s.index.length + ' 组对话 · ' + s.source.countImages() + ' 张图片'));
+    item.appendChild(meta);
+    const rm = el('button', 'rm', '移除');
+    rm.addEventListener('click', () => removeSource(s.key));
+    item.appendChild(rm);
+    list.appendChild(item);
+  }
+}
+
+function showMergeEmpty() {
+  state.loaded = null;
+  els.mergeEmpty.style.display = 'grid';
+  els.mergeBody.style.display = 'none';
+}
+
+/* ============================================================
+ * 14. 事件
+ * ============================================================ */
+els.listScroll.addEventListener('click', ev => {
+  const row = ev.target.closest('.row');
+  if (!row) return;
+  if (ev.target.closest('.cb')) {
+    const id = row.dataset.id;
+    if (state.selection.has(id)) state.selection.delete(id); else state.selection.add(id);
+    row.classList.toggle('sel', state.selection.has(id));
+    updateStats();
+    validateSelection();
+    return;
+  }
+  openSession(row.dataset.id);
+});
+
+$('#filterChips').addEventListener('click', ev => {
+  const b = ev.target.closest('button[data-filter]');
+  if (!b) return;
+  state.filter = b.dataset.filter;
+  document.querySelectorAll('#filterChips .chip').forEach(x => x.classList.toggle('on', x === b));
+  renderList();
+});
+
+$('#selAll').addEventListener('click', () => {
+  filteredRows().forEach(r => state.selection.add(r.id));
+  renderList(); updateStats(); validateSelection();
+});
+$('#invert').addEventListener('click', () => {
+  filteredRows().forEach(r => {
+    if (state.selection.has(r.id)) state.selection.delete(r.id); else state.selection.add(r.id);
+  });
+  renderList(); updateStats(); validateSelection();
+});
+$('#clearSel').addEventListener('click', () => {
+  state.selection.clear();
+  renderList(); updateStats(); validateSelection();
+});
+
+$('#btnDir').addEventListener('click', () => $('#dirInput').click());
+$('#btnZip').addEventListener('click', () => $('#zipInput').click());
+$('#dirInput').addEventListener('change', async ev => {
+  const files = Array.from(ev.target.files || []);
+  if (files.length) {
+    try { await addFolderSource(files); } catch (e) { toast(e.message, 'err', 6000); }
+  }
+  ev.target.value = '';
+});
+$('#zipInput').addEventListener('change', async ev => {
+  const files = Array.from(ev.target.files || []);
+  ev.target.value = '';                       // 先清空，失败时也能再次选同一批文件
+  for (const f of files) {
+    try { await addZipSource(f); }
+    catch (e) { toast(f.name + '：' + e.message, 'err', 6000); }
+  }
+});
+
+let dragDepth = 0;
+const veil = $('#dragveil');
+window.addEventListener('dragenter', ev => { if (ev.dataTransfer) { dragDepth++; veil.classList.add('on'); } });
+window.addEventListener('dragover', ev => { ev.preventDefault(); if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'copy'; });
+window.addEventListener('dragleave', () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) veil.classList.remove('on'); });
+window.addEventListener('drop', async ev => {
+  ev.preventDefault();
+  dragDepth = 0;
+  veil.classList.remove('on');
+  const dt = ev.dataTransfer;
+  if (!dt) return;
+  try {
+    const items = Array.from(dt.items || []);
+    const entries = items.map(i => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+    if (entries.length) {
+      let added = 0;
+      for (const entry of entries) {
+        try {
+          if (entry.isFile) {
+            const file = await new Promise((res, rej) => entry.file(res, rej));
+            if (!/\.zip$/i.test(file.name)) throw new Error('不是 .zip 文件');
+            await addZipSource(file);
+            added++;
+          } else if (entry.isDirectory) {
+            const out = [];
+            await readEntryRecursive(entry, '', out);
+            const first = out.length && out[0].path ? out[0].path.split('/')[0] : '';
+            await addFolderSource(out.map(r => r.file), out.map(r => r.path), first || undefined);
+            added++;
+          }
+        } catch (err) {
+          toast((entry.name || '文件') + '：' + err.message, 'err', 6000);
+        }
+      }
+      if (!added) toast('没有识别到可载入的导出包', 'warn');
+      return;
+    }
+    const files = Array.from(dt.files || []);
+    if (!files.length) { toast('没有识别到可载入的文件', 'warn'); return; }
+    if (files.every(f => /\.zip$/i.test(f.name))) {
+      // 一次拖入多个 ZIP：逐个载入，失败的单独提示，不影响其它包
+      for (const f of files) {
+        try { await addZipSource(f); } catch (e) { toast(f.name + '：' + e.message, 'err', 6000); }
+      }
+      return;
+    }
+    await addFolderSource(files);
+  } catch (err) {
+    toast(err.message, 'err', 6000);
+  }
+});
+
+els.optUser.addEventListener('change', () => {
+  state.includeUser = els.optUser.checked;
+  if (state.result) { URL.revokeObjectURL(state.result.url); state.result = null; resetGenButton(); }
+  if (state.includeUser) toast('已开启：将包含 user.json（账号信息），请勿随意外传', 'warn', 5000);
+  updateValidationUI();
+});
+
+$('#valMore').addEventListener('click', showDetails);
+$('#btnHelp').addEventListener('click', () => $('#helpDlg').showModal());
+$('#btnSelftest').addEventListener('click', runSelftest);
+$('#btnSample').addEventListener('click', loadSample);
+els.btnGen.addEventListener('click', () => {
+  if (state.result && els.btnGen.classList.contains('done')) downloadResult();
+  else generate();
+});
+document.querySelectorAll('[data-close]').forEach(b => {
+  b.addEventListener('click', () => { const d = document.getElementById(b.dataset.close); if (d) d.close(); });
+});
+document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape' && window.innerWidth <= 1200) els.mergePanel.classList.remove('open');
+});
+
+/* ============================================================
+ * 15. 自检
+ * ============================================================ */
+async function runSelftest() {
+  if (!state.sources.length) return;
+  const btn = $('#btnSelftest');
+  btn.disabled = true;
+  try {
+    const L = s => (window.DS_I18N ? DS_I18N.t(s) : s);
+    const lines = [];
+    lines.push(L('版本源：') + state.sources.map(s => s.key + '=' + s.label).join(' / '));
+    const ids = Array.from(state.selection).slice(0, 2);
+    if (!ids.length) ids.push(Array.from(state.groups.keys())[0]);
+    for (const id of ids) {
+      const s = await mergedSession(id);
+      lines.push('· ' + (s.title || id) + L('：合并后 ') + s.messages.length + L(' 条消息，head=#') + s.current_message_id);
+      const chk = checkSession(s, '「' + (s.title || id) + '」');
+      lines.push('  ' + L('校验：') + (chk.errors.length ? chk.errors.map(L).join(L('；')) : L('通过')));
+    }
+    const entries = [];
+    entries.push({ name: 'manifest.json', bytes: ENC.encode('{"export_format_version":3}'), compress: true });
+    const index = [];
+    for (const id of ids) {
+      const s = await mergedSession(id);
+      index.push({ id: s.id, title: s.title, pinned: false, message_count: s.messages.length, inserted_at: s.inserted_at, updated_at: s.updated_at });
+      entries.push({ name: 'chat_sessions/' + s.id + '.json', bytes: ENC.encode(JSON.stringify(s)), compress: true });
+    }
+    entries.push({ name: 'chat_session_index.json', bytes: ENC.encode(JSON.stringify(index)), compress: true });
+    const blob = await buildZip(entries, null, null);
+    lines.push(L('样本包：') + entries.length + ' ' + L('条目 · ') + bytesText(blob.size));
+    const problems = await selfCheck(blob, ids);
+    lines.push(L('复解析自检：') + (problems.length ? problems.map(L).join(L('；')) : L('通过（顺序 / CRC / 索引一致）')));
+
+    $('#dlgTitle').textContent = L('自检结果');
+    const box = $('#dlgBody');
+    box.replaceChildren();
+    box.appendChild(el('pre', '', lines.join('\n')));
+    if (!problems.length) box.appendChild(el('p', '', L('结构符合 demo 导入要求。')));
+    $('#detailDlg').showModal();
+  } catch (err) {
+    toast('自检失败：' + (err && err.message ? err.message : err), 'err', 6000);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+/* ============================================================
+ * 16. 启动
+ * ============================================================ */
+if (!HAS_DS || !HAS_CS) {
+  const hint = el('div', 'hint');
+  hint.textContent = '当前浏览器缺少压缩流 API：导出将不压缩，读取 deflate 压缩的 ZIP 会失败。请改用 Chrome / Edge，或解压后拖入文件夹/ZIP。';
+  $('#sidebar').appendChild(hint);
+}
+updateValidationUI();
+updateStats();
+
+/* 供自动化验证使用：纯函数无副作用；state / registerSource / mergedSession / generate
+ * 会改动内部状态，仅供本地测试脚本调用，页面本身不使用。 */
+window.__MERGE__ = {
+  canon, msgSig, diffVersions, buildZip, parseZip, selfCheck, checkSession, crc32, isDemoTs,
+  state, FolderSource, ZipSource, registerSource, mergedSession, validateSelection, loadSample, generate,
+};
+})();
+</script>
+</body>
+</html>
