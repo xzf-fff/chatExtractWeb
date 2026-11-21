@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>chat-demo 导入报错怎么办：文件内容不完整 / 消息分支已损坏 / 附件数据已损坏 · ChatExtract</title>
+<meta name="description" content="chat-demo 导入历史对话失败的四种常见原因与解决办法：无法识别该文件、文件内容不完整、消息分支已损坏、附件数据已损坏，以及如何重新生成可导入的 ZIP。">
+<meta name="keywords" content="chat-demo 导入失败, 文件内容不完整, 消息分支已损坏, 附件数据已损坏, DeepSeek 导出 导入">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/fix.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/fix.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/fix.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/fix.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="chat-demo 导入报错排查">
+<meta property="og:description" content="文件内容不完整、消息分支已损坏、附件数据已损坏、无法识别该文件——四种导入失败的原因与解决办法。">
+<meta property="og:url" content="https://fastaibook.tech/fix.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta name="twitter:image:alt" content="ChatExtract — DeepSeek 对话导出工具">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="chat-demo 导入报错排查">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'chat-demo 导入报错怎么办：文件内容不完整 / 消息分支已损坏 / 附件数据已损坏 · ChatExtract',
+    description: 'chat-demo 导入历史对话失败的四种常见原因与解决办法：无法识别该文件、文件内容不完整、消息分支已损坏、附件数据已损坏。'
+  },
+  en: {
+    title: 'Fixing chat-demo import errors: incomplete file, broken branch, corrupt attachment',
+    description: 'Four common reasons a DeepSeek export fails to import into chat-demo — unrecognized file, incomplete content, broken message branch, corrupt attachment — and how to fix each.'
+  }
+};
+</script>
+<script src="assets/i18n.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "chat-demo 导入报错排查",
+  "description": "chat-demo import errors: unrecognized file, incomplete content, broken message branch, corrupt attachment.",
+  "inLanguage": ["zh-CN", "en"],
+  "url": "https://fastaibook.tech/fix.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["chat-demo", "DeepSeek chat export", "ZIP import errors"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "chat-demo 提示「文件内容不完整」怎么办？",
+      "acceptedAnswer": { "@type": "Answer", "text": "索引 chat_session_index.json 里的会话 id 集合必须与包内 chat_sessions/*.json 完全相等，而且索引要排在所有会话文件之后。只保留部分对话时，必须同时裁剪会话文件和索引，顺序为 manifest → user.json → 会话 → 索引 → 附件。用 ChatExtract 重新打包会自动满足这些条件。" }
+    },
+    {
+      "@type": "Question",
+      "name": "chat-demo 报「消息分支已损坏」是什么原因？",
+      "acceptedAnswer": { "@type": "Answer", "text": "会话里的 current_message_id 或某条消息的 parent_id 指向了不存在的消息。手工拼接两份导出、或合并后没有重算消息 id 与父链时会触发。用版本合并器重新合并会重算 id 与父链，并让当前分支指向真实存在的叶子节点。" }
+    },
+    {
+      "@type": "Question",
+      "name": "chat-demo 报「附件数据已损坏」怎么修？",
+      "acceptedAnswer": { "@type": "Answer", "text": "FILE 片段里的 export_path 必须与包内实际路径完全一致，且附件文件必须存在。附件路径应保持 chat_sessions/<会话 id>_files/<文件名>，不要改名或移动；条目名含非 ASCII 字符（如中文文件名）会被 demo 拒绝。" }
+    },
+    {
+      "@type": "Question",
+      "name": "chat-demo 提示「无法识别该文件」？",
+      "acceptedAnswer": { "@type": "Answer", "text": "包内第一个条目必须是 manifest.json，内容为 export_format_version: 3。用系统压缩工具重新压缩会打乱条目顺序，导致 demo 读不到 manifest。用 ChatExtract 导出的包固定把 manifest 写在第一位。" }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "报错排查", "item": "https://fastaibook.tech/fix.html" }
+  ]
+}
+</script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="index.html" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="index.html"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html" aria-current="page"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">chat-demo 导入报错排查</span><span data-lang="en">chat-demo import troubleshooting</span></h1>
+    <p><span data-lang="zh">四种最常见的导入失败：先看现象，再看原因，最后按步骤解决。</span><span data-lang="en">The four most common import failures: symptom, cause, then the fix.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#unrecognized"><span data-lang="zh">无法识别该文件</span><span data-lang="en">Unrecognized file</span></a>
+      <a href="#incomplete"><span data-lang="zh">文件内容不完整</span><span data-lang="en">Incomplete content</span></a>
+      <a href="#branch"><span data-lang="zh">消息分支已损坏</span><span data-lang="en">Broken branch</span></a>
+      <a href="#attachment"><span data-lang="zh">附件数据已损坏</span><span data-lang="en">Corrupt attachment</span></a>
+      <a href="#why"><span data-lang="zh">为什么手改 ZIP 容易坏</span><span data-lang="en">Why hand-editing fails</span></a>
+      <a href="#fix"><span data-lang="zh">用工具一次解决</span><span data-lang="en">Fix it with the tools</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="unrecognized"><span data-lang="zh">「无法识别该文件」</span><span data-lang="en">“Unrecognized file”</span></h2>
+      <p><span data-lang="zh"><strong>现象：</strong>选完 ZIP 立刻报错，连导入进度都没有出现。</span><span data-lang="en"><strong>Symptom:</strong> the error appears right after picking the ZIP, before any progress.</span></p>
+      <p><span data-lang="zh"><strong>原因：</strong>包内<strong>第一个条目不是 <code>manifest.json</code></strong>，或缺少 <code>export_format_version: 3</code>。demo 按条目流顺序解析，先读 manifest 判断格式；用系统压缩工具（右键 → 压缩）重打一次包，就会把条目顺序打乱。</span><span data-lang="en"><strong>Cause:</strong> <code>manifest.json</code> is not the <strong>first entry</strong>, or <code>export_format_version: 3</code> is missing. The demo parses the archive as a stream and reads the manifest first; re-zipping with the OS “Compress” command reorders entries.</span></p>
+      <p><span data-lang="zh"><strong>解决：</strong>用本工具导出（固定把 manifest 写成第一个条目），不要用系统压缩工具二次打包。</span><span data-lang="en"><strong>Fix:</strong> export with these tools (manifest is always written first); never re-zip with the OS archiver.</span></p>
+
+      <h2 id="incomplete"><span data-lang="zh">「文件内容不完整」</span><span data-lang="en">“Incomplete content”</span></h2>
+      <p><span data-lang="zh"><strong>现象：</strong>导入进行到一半中止，会话列表没有更新。</span><span data-lang="en"><strong>Symptom:</strong> the import stops midway and the conversation list stays unchanged.</span></p>
+      <p><span data-lang="zh"><strong>原因：</strong><code>chat_session_index.json</code> 里的会话 id 集合与包内 <code>chat_sessions/*.json</code> <strong>不完全相等</strong>（多一个少一个都不行）；或者索引被排在了会话文件之前——demo 会把后面的会话当成附件。</span><span data-lang="en"><strong>Cause:</strong> the ids in <code>chat_session_index.json</code> do not <strong>exactly match</strong> the packaged <code>chat_sessions/*.json</code>; or the index sits before the session files, so later entries get treated as attachments.</span></p>
+      <p><span data-lang="zh"><strong>解决：</strong>只保留部分对话时，<strong>必须同时裁剪索引</strong>；顺序固定为 <code>manifest → user.json → 会话 → 索引 → 附件</code>。</span><span data-lang="en"><strong>Fix:</strong> when keeping a subset, <strong>prune the index too</strong>; the order must be <code>manifest → user.json → sessions → index → attachments</code>.</span></p>
+
+      <h2 id="branch"><span data-lang="zh">「消息分支已损坏」</span><span data-lang="en">“Message branch is broken”</span></h2>
+      <p><span data-lang="zh"><strong>现象：</strong>导入成功，但打开某个对话时报错或显示空白。</span><span data-lang="en"><strong>Symptom:</strong> import succeeds, but opening a conversation fails or shows nothing.</span></p>
+      <p><span data-lang="zh"><strong>原因：</strong><code>current_message_id</code> 或某条消息的 <code>parent_id</code> 指向了<strong>不存在的消息</strong>。手工拼接两份导出、或合并后没有重算消息 id 与父链时最容易触发。</span><span data-lang="en"><strong>Cause:</strong> <code>current_message_id</code> or some message's <code>parent_id</code> points at a <strong>message that does not exist</strong> — typical when splicing two exports together or merging without recomputing ids and parents.</span></p>
+      <p><span data-lang="zh"><strong>解决：</strong>用版本合并器重新合并：它会按内容对齐两份导出、重算消息 id 与父链，并让「当前分支」指向真实存在的叶子。</span><span data-lang="en"><strong>Fix:</strong> re-merge with the version merger: it aligns both exports by content, recomputes message ids and parent links, and points the current branch at an existing leaf.</span></p>
+
+      <h2 id="attachment"><span data-lang="zh">「附件数据已损坏」</span><span data-lang="en">“Attachment data is corrupt”</span></h2>
+      <p><span data-lang="zh"><strong>现象：</strong>正文能看，但图片全部裂开。</span><span data-lang="en"><strong>Symptom:</strong> text renders but every image is broken.</span></p>
+      <p><span data-lang="zh"><strong>原因：</strong>FILE 片段里的 <code>export_path</code> 与包内实际路径不一致，或附件文件缺失；另外条目名含非 ASCII 字符（例如中文文件名）也会被 demo 拒绝。</span><span data-lang="en"><strong>Cause:</strong> the FILE fragment's <code>export_path</code> does not match the packaged path, or the file is missing; non-ASCII entry names (e.g. Chinese filenames) are also rejected.</span></p>
+      <p><span data-lang="zh"><strong>解决：</strong>附件保持 <code>chat_sessions/&lt;会话 id&gt;_files/&lt;文件名&gt;</code> 原路径原样复制，不改名、不移动。</span><span data-lang="en"><strong>Fix:</strong> copy attachments verbatim to <code>chat_sessions/&lt;session-id&gt;_files/&lt;filename&gt;</code> — no renaming, no moving.</span></p>
+
+      <h2 id="why"><span data-lang="zh">为什么手改 ZIP 容易坏</span><span data-lang="en">Why hand-editing a ZIP breaks</span></h2>
+      <p><span data-lang="zh">demo 的导入器比大多数工具严格，四条硬约束叠在一起，手工操作很容易踩中其中一条：</span><span data-lang="en">The demo's importer is stricter than most tools; four hard constraints stack up:</span></p>
+      <ol>
+        <li><span data-lang="zh"><strong>条目顺序</strong>：manifest 必须第一个，附件必须在索引之后。</span><span data-lang="en"><strong>Entry order</strong>: manifest first, attachments after the index.</span></li>
+        <li><span data-lang="zh"><strong>id 集合相等</strong>：索引与包内会话文件必须一一对应。</span><span data-lang="en"><strong>Matching id sets</strong>: index entries and session files must correspond one to one.</span></li>
+        <li><span data-lang="zh"><strong>ZIP 限制</strong>：只接受 Store / Deflate，不支持 ZIP64、data descriptor、加密包和非 ASCII 条目名。</span><span data-lang="en"><strong>ZIP limits</strong>: Store/Deflate only; no ZIP64, data descriptor, encryption, or non-ASCII entry names.</span></li>
+        <li><span data-lang="zh"><strong>字段校验</strong>：时间戳格式、<code>role</code>/<code>status</code> 枚举、<code>parent_id</code> 与 <code>current_message_id</code> 必须自洽。</span><span data-lang="en"><strong>Field checks</strong>: timestamp format, <code>role</code>/<code>status</code> enums, and self-consistent <code>parent_id</code>/<code>current_message_id</code>.</span></li>
+      </ol>
+
+      <h2 id="fix"><span data-lang="zh">用工具一次解决</span><span data-lang="en">Fix it in one go</span></h2>
+      <p><span data-lang="zh">两个工具在导出前都会按上面四条逐项校验，发现错误直接阻止导出并指出具体会话；导出后还会重新解析成品做自检（首条目、顺序、CRC、索引一致性），通过才给你下载。所以只要用它们打包，这四种报错基本不会出现。</span><span data-lang="en">Both tools validate all four rules before exporting, block on errors with the offending conversation named, then re-parse the produced ZIP (first entry, order, CRC, index consistency) before offering the download — so these four errors practically disappear.</span></p>
+      <p><a class="btn btn-primary" href="subset-tool.html"><span data-lang="zh">打开子集提取</span><span data-lang="en">Open subset extractor</span></a>
+        <a class="btn" href="merge-tool.html"><span data-lang="zh">打开版本合并</span><span data-lang="en">Open version merger</span></a></p>
+      <p><span data-lang="zh" style="color:var(--tx3);font-size:13px">导入前请先备份：demo 的导入会覆盖本地全部对话。详见<a href="guide.html#import">使用指南</a>。</span><span data-lang="en" style="color:var(--tx3);font-size:13px">Back up first: importing replaces all conversations in the demo. See the <a href="guide.html#import">guide</a>.</span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="fix.html"><span data-lang="zh">导入报错排查</span><span data-lang="en">Import troubleshooting</span></a>
+        <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="guide.html#privacy"><span data-lang="zh">隐私与数据</span><span data-lang="en">Privacy and data</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

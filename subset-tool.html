@@ -497,6 +497,7 @@ window.PAGE_META = {
     <a href="subset-tool.html" aria-current="page"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
     <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
     <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+      <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
   </nav>
   <div class="nav-right">
     <div class="lang-switch" role="group" aria-label="Language">
@@ -581,6 +582,12 @@ window.PAGE_META = {
       <div class="stat-row"><span class="k">已选对话</span><span class="v acc" id="statSel">0</span></div>
       <div class="stat-row"><span class="k">原始体积</span><span class="v mono" id="statSize">0 B</span></div>
       <div class="hint" id="statHint">勾选要保留的对话，生成可导入 chat-demo 的 ZIP。</div>
+    </div>
+
+    <div class="sb-about">
+      <h2>关于对话子集提取器</h2>
+      <p data-lang="zh">从 DeepSeek 导出的完整数据里按标题挑出要保留的对话，可预览正文与图片，再把它们重新打包成与官方导出结构一致的 ZIP，可直接在 chat-demo 的「设置 → 数据管理 → 导入历史对话」中导入。全程在浏览器本地完成，不上传任何数据。</p>
+      <p data-lang="en">Pick the conversations you want to keep from a full DeepSeek export, preview the messages and images, then repackage them into a ZIP with the same structure as the official export, which chat-demo accepts via “Settings → Data → Import history”. Everything runs locally in the browser; no data is uploaded.</p>
     </div>
   </aside>
 

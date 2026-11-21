@@ -391,6 +391,7 @@ window.PAGE_META = {
     <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
     <a href="merge-tool.html" aria-current="page"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
     <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+      <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
   </nav>
   <div class="nav-right">
     <div class="lang-switch" role="group" aria-label="Language">
@@ -444,6 +445,12 @@ window.PAGE_META = {
       <div class="stat-row"><span class="k">已选导出</span><span class="v acc" id="statSel">0</span></div>
       <div class="stat-row"><span class="k">当前冲突</span><span class="v mono" id="statConf">0</span></div>
       <div class="hint" id="statHint">选择左侧会话，逐条决定冲突保留哪一版。</div>
+    </div>
+
+    <div class="sb-about">
+      <h2>关于对话版本合并器</h2>
+      <p data-lang="zh">同一组对话在不同日期各导出过一次时，把两份数据按消息内容对齐，逐条解决正文冲突、重选当前分支，再重算索引与附件，导出可直接导入 chat-demo 的 ZIP。即使两份导出的消息 id 被重排过也能自动纠正。全程在浏览器本地完成，不上传任何数据。</p>
+      <p data-lang="en">When the same conversation was exported on two different dates, this tool aligns both copies by message content, lets you resolve each conflict and pick the current branch, then recomputes the index and attachments and exports a ZIP that imports into chat-demo. Renumbered message ids between exports are corrected automatically. Everything runs locally; no data is uploaded.</p>
     </div>
   </aside>
 

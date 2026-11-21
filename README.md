@@ -2,6 +2,8 @@
 
 从 DeepSeek 导出的 `deepseek_data-YYYY-MM-DD/` 目录（几百组对话）中按**标题**挑出指定对话，打包成一个可直接导入 `chat-demo` 的 ZIP。原始导出数据只读，不会被修改。
 
+**在线使用：<https://fastaibook.tech>**（英文：<https://fastaibook.tech/en/>）· 纯前端，数据不上传，也可下载后离线打开。
+
 ![ChatExtract](assets/og.png)
 
 两个工具，产物格式一致：

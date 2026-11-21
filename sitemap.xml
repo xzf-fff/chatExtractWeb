@@ -73,4 +73,22 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/merge-tool.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/merge-tool.html"/>
   </url>
+<url>
+    <loc>https://fastaibook.tech/fix.html</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/fix.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/fix.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/fix.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/fix.html</loc>
+    <lastmod>2026-11-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/fix.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/fix.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/fix.html"/>
+  </url>
 </urlset>
