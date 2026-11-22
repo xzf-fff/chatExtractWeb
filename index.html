@@ -102,7 +102,7 @@ window.PAGE_META = {
         {
           "@type": "Question",
           "name": "对话数据会上传到服务器吗？",
-          "acceptedAnswer": { "@type": "Answer", "text": "不会。两个工具都是纯前端页面，ZIP 解析、合并与打包全部在浏览器内存中完成，页面不发起任何网络请求。" }
+          "acceptedAnswer": { "@type": "Answer", "text": "不会。ZIP 解析、合并与打包全部在浏览器内存中完成，对话文件不会被上传。页面嵌入的 Google AdSense 广告脚本只向 Google 请求广告，接触不到你选择的文件。" }
         },
         {
           "@type": "Question",
@@ -124,6 +124,8 @@ window.PAGE_META = {
   ]
 }
 </script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
 </head>
 <body>
 
@@ -310,7 +312,7 @@ window.PAGE_META = {
       <div class="faq">
         <details>
           <summary><span data-lang="zh">对话数据会上传到服务器吗？</span><span data-lang="en">Is my data uploaded anywhere?</span></summary>
-          <div class="answer"><p><span data-lang="zh">不会。两个工具都是纯前端页面，ZIP 解析、合并与打包全部在浏览器内存中完成，页面不发起任何网络请求。你可以下载后断网使用。</span><span data-lang="en">No. Both tools are static pages; parsing, merging and packing happen in browser memory with no network requests. You can download them and use them offline.</span></p></div>
+          <div class="answer"><p><span data-lang="zh">不会。ZIP 解析、合并与打包全部在浏览器内存中完成，对话文件不会被上传到任何服务器。页面嵌入了 Google AdSense 广告脚本，它会向 Google 请求广告（可能使用 Cookie），但接触不到你选择的文件。</span><span data-lang="en">No. Parsing, merging and packing all happen in browser memory; your files are never uploaded. The page embeds Google AdSense, which requests ads from Google (and may use cookies) but has no access to the files you select.</span></p></div>
         </details>
         <details>
           <summary><span data-lang="zh">为什么不能直接把原始导出包导入 chat-demo？</span><span data-lang="en">Why can't I import the original export directly?</span></summary>
@@ -355,6 +357,7 @@ window.PAGE_META = {
       </div>
       <div>
         <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
         <a href="guide.html#privacy"><span data-lang="zh">隐私与数据</span><span data-lang="en">Privacy and data</span></a>
         <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
         <a href="guide.html#faq"><span data-lang="zh">常见问题</span><span data-lang="en">FAQ</span></a>

@@ -19,11 +19,12 @@ const outDir = path.join(root, 'en');
 fs.mkdirSync(outDir, { recursive: true });
 
 const BASE = 'https://fastaibook.tech';
-const PAGES = ['index.html', 'guide.html', 'fix.html', 'subset-tool.html', 'merge-tool.html'];
+const PAGES = ['index.html', 'guide.html', 'fix.html', 'privacy.html', 'subset-tool.html', 'merge-tool.html'];
 const NAV = {
   'index.html': '/en/',
   'guide.html': '/en/guide.html',
   'fix.html': '/en/fix.html',
+  'privacy.html': '/en/privacy.html',
   'subset-tool.html': '/en/subset-tool.html',
   'merge-tool.html': '/en/merge-tool.html',
 };
