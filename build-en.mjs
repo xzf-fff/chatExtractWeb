@@ -19,12 +19,28 @@ const outDir = path.join(root, 'en');
 fs.mkdirSync(outDir, { recursive: true });
 
 const BASE = 'https://fastaibook.tech';
-const PAGES = ['index.html', 'guide.html', 'fix.html', 'privacy.html', 'subset-tool.html', 'merge-tool.html'];
+const PAGES = [
+  'index.html', 'guide.html', 'fix.html', 'privacy.html', 'articles.html',
+  'deepseek-export-structure.html', 'keep-subset-of-chats.html', 'merge-deepseek-exports.html',
+  'export-attachments.html', 'local-vs-cloud-privacy.html', 'what-is-chat-demo.html',
+  'export-size-optimization.html', 'chat-demo-backup-migrate.html', 'deepseek-export-faq.html',
+  'subset-tool.html', 'merge-tool.html',
+];
 const NAV = {
   'index.html': '/en/',
   'guide.html': '/en/guide.html',
   'fix.html': '/en/fix.html',
   'privacy.html': '/en/privacy.html',
+  'articles.html': '/en/articles.html',
+  'deepseek-export-structure.html': '/en/deepseek-export-structure.html',
+  'keep-subset-of-chats.html': '/en/keep-subset-of-chats.html',
+  'merge-deepseek-exports.html': '/en/merge-deepseek-exports.html',
+  'export-attachments.html': '/en/export-attachments.html',
+  'local-vs-cloud-privacy.html': '/en/local-vs-cloud-privacy.html',
+  'what-is-chat-demo.html': '/en/what-is-chat-demo.html',
+  'export-size-optimization.html': '/en/export-size-optimization.html',
+  'chat-demo-backup-migrate.html': '/en/chat-demo-backup-migrate.html',
+  'deepseek-export-faq.html': '/en/deepseek-export-faq.html',
   'subset-tool.html': '/en/subset-tool.html',
   'merge-tool.html': '/en/merge-tool.html',
 };

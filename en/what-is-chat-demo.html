@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<script>window.__FORCE_LANG__ = 'en';</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>chat-demo 是什么、能做什么：导入历史对话的落点 · ChatExtract</title>
+<meta name="description" content="chat-demo 是 DeepSeek 官方的 API 使用 demo（开源静态站）。它能导入导出的 ZIP 来浏览历史对话，但导入会覆盖本地数据、且有严格的包结构要求。">
+<meta name="keywords" content="chat-demo 是什么, DeepSeek chat-demo, 导入历史对话, chat-demo 官网">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/en/what-is-chat-demo.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/what-is-chat-demo.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/what-is-chat-demo.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/what-is-chat-demo.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="chat-demo 是什么、能做什么">
+<meta property="og:description" content="官方 API demo，支持导入导出的 ZIP 浏览历史对话，导入会覆盖本地数据。">
+<meta property="og:url" content="https://fastaibook.tech/en/what-is-chat-demo.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'chat-demo 是什么、能做什么：导入历史对话的落点 · ChatExtract',
+    description: 'chat-demo 是 DeepSeek 官方的 API 使用 demo（开源静态站）。它能导入导出的 ZIP 来浏览历史对话，但导入会覆盖本地数据。'
+  },
+  en: {
+    title: 'What is chat-demo?',
+    description: 'chat-demo is DeepSeek\'s open-source API demo site. It can import an exported ZIP to browse history, but importing replaces local data.'
+  }
+};
+</script>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "chat-demo 是什么、能做什么",
+  "description": "What DeepSeek's chat-demo is and how it handles imported exports.",
+  "inLanguage": ["en"],
+  "url": "https://fastaibook.tech/en/what-is-chat-demo.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["chat-demo", "DeepSeek"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "chat-demo 是什么", "item": "https://fastaibook.tech/en/what-is-chat-demo.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="/en/" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">chat-demo 是什么、能做什么</span><span data-lang="en">What is chat-demo?</span></h1>
+    <p><span data-lang="zh">它是 DeepSeek 官方开源的「API 使用 demo」，一个静态网页。我们生成的 ZIP 最终就是导入到这里——所以先搞清它能做什么、不能做什么。</span><span data-lang="en">It is DeepSeek's open-source “API usage demo”, a static website. The ZIP we produce is imported there — so it's worth knowing what it does and doesn't do.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#what"><span data-lang="zh">它是什么</span><span data-lang="en">What it is</span></a>
+      <a href="#why"><span data-lang="zh">为什么和导出有关</span><span data-lang="en">Why it matters</span></a>
+      <a href="#how"><span data-lang="zh">怎么导入</span><span data-lang="en">How to import</span></a>
+      <a href="#rules"><span data-lang="zh">它对包的三个要求</span><span data-lang="en">Three package rules</span></a>
+      <a href="#limits"><span data-lang="zh">不能做什么</span><span data-lang="en">What it can't do</span></a>
+      <a href="#faq"><span data-lang="zh">三个常见疑问</span><span data-lang="en">Three questions</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="what"><span data-lang="zh">它是什么</span><span data-lang="en">What it is</span></h2>
+      <ul>
+        <li><span data-lang="zh">DeepSeek 官方仓库 <code>deepseek-ai/chat-demo</code> 的开源项目，MIT 许可，纯静态站点；</span><span data-lang="en">An open-source project in DeepSeek's official <code>deepseek-ai/chat-demo</code> repo, MIT licensed, a pure static site;</span></li>
+        <li><span data-lang="zh">官方部署地址：<a href="https://deepseek-ai.github.io/chat-demo/" target="_blank" rel="noopener">deepseek-ai.github.io/chat-demo</a>；</span><span data-lang="en">official deployment: <a href="https://deepseek-ai.github.io/chat-demo/" target="_blank" rel="noopener">deepseek-ai.github.io/chat-demo</a>;</span></li>
+        <li><span data-lang="zh">用途是演示 API 的对话能力，界面里的数据保存在**你当前的浏览器**里，具体行为以官方仓库为准。</span><span data-lang="en">It demonstrates the API's chat capability, and its data lives <strong>in your current browser</strong>; the official repo is the reference for details.</span></li>
+      </ul>
+
+      <h2 id="why"><span data-lang="zh">为什么它和「导出数据」有关</span><span data-lang="en">Why it matters for exports</span></h2>
+      <p><span data-lang="zh">真正的 DeepSeek 账号数据在云端，导出出来是一个 ZIP。chat-demo 提供了一个把这种 ZIP **重新装回界面里浏览**的入口：「设置 → 数据管理 → 导入历史对话」。这也是我们能验证「导出包是否合法」的最直接方式——导入成功，说明包结构和字段都对。</span><span data-lang="en">Your real account data lives in the cloud; the export is a ZIP. chat-demo offers a way to <strong>load such a ZIP back into a UI</strong> via “Settings → Data → Import history”, which is also the most direct way to verify that a package is valid: if it imports, the structure and fields are right.</span></p>
+
+      <h2 id="how"><span data-lang="zh">怎么导入</span><span data-lang="en">How to import</span></h2>
+      <ol>
+        <li><span data-lang="zh">打开官方 chat-demo；</span><span data-lang="en">open the official chat-demo;</span></li>
+        <li><span data-lang="zh">进入「设置 → 数据管理 → 导入历史对话」；</span><span data-lang="en">go to “Settings → Data → Import history”;</span></li>
+        <li><span data-lang="zh">选择你要导入的 ZIP，确认；</span><span data-lang="en">pick the ZIP and confirm;</span></li>
+        <li><span data-lang="zh">检查列表数量是否与包内一致、点开确认图片能显示。</span><span data-lang="en">check that the list count matches the package and that images render.</span></li>
+      </ol>
+      <p><span data-lang="zh"><strong>导入是整包替换</strong>：会先清空 demo 里已有的对话与附件，再写入包内的。所以导入前请先在 demo 里「导出所有历史对话」备份一次。</span><span data-lang="en"><strong>Import replaces everything</strong>: it clears the demo's existing conversations and attachments, then writes the package contents. Export your current history inside the demo first.</span></p>
+
+      <h2 id="rules"><span data-lang="zh">它对包的三个要求</span><span data-lang="en">Three package rules it enforces</span></h2>
+      <ol>
+        <li><span data-lang="zh"><code>manifest.json</code> 必须是第一个条目（内容是 <code>{"export_format_version":3}</code>）；</span><span data-lang="en"><code>manifest.json</code> must be the first entry (holding <code>{"export_format_version":3}</code>);</span></li>
+        <li><span data-lang="zh">索引里的会话 id 集合必须与包内 <code>chat_sessions/*.json</code> 完全相等；</span><span data-lang="en">the index's id set must exactly equal the packaged <code>chat_sessions/*.json</code>;</span></li>
+        <li><span data-lang="zh">条目顺序固定：manifest → user.json（可选）→ 会话 → 索引 → 附件。</span><span data-lang="en">fixed order: manifest → user.json (optional) → sessions → index → attachments.</span></li>
+      </ol>
+      <p><span data-lang="zh">细节和原因见 <a href="deepseek-export-structure.html">导出包结构详解</a>；报错怎么排查见 <a href="fix.html">报错排查</a>。</span><span data-lang="en">Details in <a href="deepseek-export-structure.html">the export structure article</a>; error handling in <a href="fix.html">troubleshooting</a>.</span></p>
+
+      <h2 id="limits"><span data-lang="zh">它不能做什么</span><span data-lang="en">What it can't do</span></h2>
+      <ul>
+        <li><span data-lang="zh">不会影响你账号里的云端对话——导入只作用于当前浏览器；</span><span data-lang="en">it does not touch your account's cloud conversations — the import is browser-local;</span></li>
+        <li><span data-lang="zh">不是官方 App 的替代品，也不提供账号同步；</span><span data-lang="en">it is not a replacement for the official app and has no account sync;</span></li>
+        <li><span data-lang="zh">清理浏览器数据（或换浏览器）后，导入的对话会消失——需要长期保留就自己存好 ZIP。</span><span data-lang="en">clearing browser data (or switching browsers) loses imported conversations — keep the ZIP if you need them long-term.</span></li>
+      </ul>
+
+      <h2 id="faq"><span data-lang="zh">三个常见疑问</span><span data-lang="en">Three questions</span></h2>
+      <ul>
+        <li><span data-lang="zh"><strong>导入后对话变少了？</strong>不是丢了，是包内本来就只有这些——导入是替换。</span><span data-lang="en"><strong>Fewer conversations after import?</strong> Nothing was lost: the package only had those. Import replaces.</span></li>
+        <li><span data-lang="zh"><strong>图片显示不出来？</strong>附件没跟着打包，或 <code>export_path</code> 与包内路径不一致，见 <a href="export-attachments.html">图片与附件</a>。</span><span data-lang="en"><strong>Images missing?</strong> Attachments weren't packaged or <code>export_path</code> doesn't match — see <a href="export-attachments.html">images and attachments</a>.</span></li>
+        <li><span data-lang="zh"><strong>导入失败？</strong>先对照 <a href="fix.html">报错排查</a> 的四种错误，多数是包结构问题。</span><span data-lang="en"><strong>Import failed?</strong> Check the four errors in <a href="fix.html">troubleshooting</a>; most are package-structure issues.</span></li>
+      </ul>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="deepseek-export-structure.html">导出包结构</a> · <a href="keep-subset-of-chats.html">只保留部分对话</a> · <a href="fix.html">报错排查</a></span><span data-lang="en">Related: <a href="deepseek-export-structure.html">export structure</a> · <a href="keep-subset-of-chats.html">keeping a subset</a> · <a href="fix.html">troubleshooting</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="/en/">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="/en/guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

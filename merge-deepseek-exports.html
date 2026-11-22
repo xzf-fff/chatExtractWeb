@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>两次 DeepSeek 导出怎么合并：冲突判定、id 重排、当前分支 · ChatExtract</title>
+<meta name="description" content="同一组 DeepSeek 对话在不同日期各导出一次怎么合并：冲突到底怎么判定、为什么消息 id 会被重排、当前分支该选哪个叶子、附件与索引怎么重算。">
+<meta name="keywords" content="DeepSeek 导出 合并, 对话 版本冲突, 消息 id 重排, current_message_id">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/merge-deepseek-exports.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/merge-deepseek-exports.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/merge-deepseek-exports.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/merge-deepseek-exports.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="两次 DeepSeek 导出怎么合并">
+<meta property="og:description" content="冲突判定、消息 id 重排、当前分支选择、附件并集与索引重算。">
+<meta property="og:url" content="https://fastaibook.tech/merge-deepseek-exports.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: '两次 DeepSeek 导出怎么合并：冲突判定、id 重排、当前分支 · ChatExtract',
+    description: '同一组对话在不同日期各导出一次怎么合并：冲突怎么判定、消息 id 为什么会被重排、当前分支怎么选。'
+  },
+  en: {
+    title: 'Merging two DeepSeek exports: conflicts, renumbered ids, branch head',
+    description: 'How to merge two exports of the same DeepSeek conversation: what counts as a conflict, why ids get renumbered, and how to pick the branch head.'
+  }
+};
+</script>
+<script src="assets/i18n.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "两次 DeepSeek 导出怎么合并",
+  "description": "Merging two DeepSeek exports of the same conversation: conflict rules, id realignment, branch head.",
+  "inLanguage": ["zh-CN", "en"],
+  "url": "https://fastaibook.tech/merge-deepseek-exports.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["DeepSeek export", "chat-demo", "merge"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "合并两次导出", "item": "https://fastaibook.tech/merge-deepseek-exports.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="index.html" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="index.html"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">两次导出怎么合并</span><span data-lang="en">Merging two exports</span></h1>
+    <p><span data-lang="zh">同一组对话在两个日期各导出一次，两份各有新增和改动。合并不是「谁覆盖谁」，而是按消息对齐后取并集。</span><span data-lang="en">The same conversation exported on two dates, each with its own additions and edits. Merging is a union by aligned message, not one export overwriting the other.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#when"><span data-lang="zh">什么时候需要合并</span><span data-lang="en">When you need it</span></a>
+      <a href="#rules"><span data-lang="zh">两条基本规则</span><span data-lang="en">Two ground rules</span></a>
+      <a href="#conflict"><span data-lang="zh">什么算冲突</span><span data-lang="en">What counts as conflict</span></a>
+      <a href="#ids"><span data-lang="zh">消息 id 会被重排</span><span data-lang="en">Ids get renumbered</span></a>
+      <a href="#head"><span data-lang="zh">当前分支怎么选</span><span data-lang="en">Choosing the head</span></a>
+      <a href="#output"><span data-lang="zh">导出与验证</span><span data-lang="en">Export and verify</span></a>
+      <a href="#pitfalls"><span data-lang="zh">四个常见坑</span><span data-lang="en">Four pitfalls</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="when"><span data-lang="zh">什么时候需要合并</span><span data-lang="en">When you need it</span></h2>
+      <ul>
+        <li><span data-lang="zh">换设备、换账号前后各导出过一次；</span><span data-lang="en">Exported once before and once after switching devices or accounts.</span></li>
+        <li><span data-lang="zh">习惯定期导出，想把几次导出并成一份完整存档；</span><span data-lang="en">You export periodically and want one complete archive.</span></li>
+        <li><span data-lang="zh">用旧包覆盖了新包（丢掉新消息），或者反过来（丢掉旧分支）。</span><span data-lang="en">An old package overwrote a new one (losing new messages) or vice versa (losing a branch).</span></li>
+      </ul>
+      <p><span data-lang="zh">直接选一个包导入都会丢东西：旧包缺后来的对话，新包可能缺当年删过、后来分支出来的内容。合并的目标是把两边的消息**取并集**。</span><span data-lang="en">Importing either package loses something: the old one lacks later messages, the new one may lack old branches. Merging takes the <strong>union</strong> of both.</span></p>
+
+      <h2 id="rules"><span data-lang="zh">两条基本规则</span><span data-lang="en">Two ground rules</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>按会话 id 分组</strong>：只有会话 id 相同，才会被当作「同一对话的不同版本」。所以两份导出必须来自同一个账号。</span><span data-lang="en"><strong>Group by conversation id</strong>: only the same id counts as two versions of one conversation, so both exports must come from the same account.</span></li>
+        <li><span data-lang="zh"><strong>按消息 id 对齐</strong>（必要时先按正文重排，见下节）：同一条消息在两版里可能是「完全相同」「被改过」「只在一版存在」三种情况。</span><span data-lang="en"><strong>Align by message id</strong> (after realignment when needed, below): a message may be identical, edited, or present in only one version.</span></li>
+      </ol>
+
+      <h2 id="conflict"><span data-lang="zh">什么算冲突</span><span data-lang="en">What counts as a conflict</span></h2>
+      <p><span data-lang="zh">比较 <code>role</code>、<code>parent_id</code> 与 <code>fragments</code>（正文/思考/工具结果）。但**只差元数据不算冲突**：</span><span data-lang="en">Compare <code>role</code>, <code>parent_id</code> and <code>fragments</code> (text / thinking / tool results). <strong>Metadata-only differences are not conflicts</strong>:</span></p>
+      <ul>
+        <li><span data-lang="zh">时间戳（含联网搜索结果的 <code>published_at</code>）、token 统计、宽高/文件大小、<code>file_id</code>；</span><span data-lang="en">timestamps (including <code>published_at</code> in search results), token counts, width/height, file size, <code>file_id</code>;</span></li>
+        <li><span data-lang="zh"><code>CONTENT_RISK</code>/<code>TIP</code> 这类系统提示多一条少一条；</span><span data-lang="en">one extra or missing <code>CONTENT_RISK</code>/<code>TIP</code> system notice;</span></li>
+        <li><span data-lang="zh"><code>content</code> 为空的空片段（例如一边多一个空 <code>REQUEST</code>）。</span><span data-lang="en">empty fragments (e.g. an extra empty <code>REQUEST</code>).</span></li>
+      </ul>
+      <p><span data-lang="zh">实际效果很明显：某会话 406 条消息，按原始字段比对会得到 <strong>210 条「冲突」</strong>；滤掉上述噪音后是 <strong>24 条</strong>；再修正下面的 id 错位后是 <strong>0 条</strong>——那份数据两版正文其实一条都没改。</span><span data-lang="en">The effect is large: for one 406-message conversation a raw comparison reported <strong>210 conflicts</strong>; after ignoring the noise above, <strong>24</strong>; after fixing the id offset below, <strong>0</strong> — the text had not actually changed at all.</span></p>
+
+      <h2 id="ids"><span data-lang="zh">消息 id 会被重排</span><span data-lang="en">Message ids get renumbered</span></h2>
+      <p><span data-lang="zh">每次导出会重新编排会话内的消息 id：中间删过消息后，后面的 id 整体前移。实测两份导出里，同一条「2022地市」在旧包里是 <code>#383</code>、在新包里是 <code>#373</code>，从那里开始整段错位 10。此时按 id 对齐，会把每一条都配给「隔壁」的消息，满屏假冲突。</span><span data-lang="en">Each export renumbers message ids: deleting messages shifts every later id. In one real pair the same message was <code>#383</code> in the older export and <code>#373</code> in the newer one — a 10-id offset from that point on, which pairs every message with its neighbour and floods you with false conflicts.</span></p>
+      <p><span data-lang="zh">解决办法是先用「角色 + 正文」做序列对齐（LCS），把两份导出的 id 归一化到同一套编号，再按 id 比较。工具会在检测到明显错位时自动这么做，并弹一次提示；id 本来就一致时不会重排。</span><span data-lang="en">The fix is to align the role + text sequences first (LCS), normalise both exports to one numbering, and only then compare by id. The tool does this automatically when it detects a clear offset and tells you once; when ids already agree nothing is renumbered.</span></p>
+
+      <h2 id="head"><span data-lang="zh">当前分支怎么选</span><span data-lang="en">Choosing the branch head</span></h2>
+      <p><span data-lang="zh">会话是消息树，<code>current_message_id</code> 决定 demo 打开时显示哪条分支的末端。合并默认取最新版本的 head；如果那条消息在合并结果里不存在，就退回一个真实存在的叶子。未选中的分支不会丢，仍然完整保留在消息里，随时可以在右栏下拉切换。</span><span data-lang="en">A conversation is a tree and <code>current_message_id</code> decides which branch end the demo opens. Merging defaults to the newest version's head, falling back to an existing leaf. Unselected branches are kept in full and can be switched from the dropdown later.</span></p>
+
+      <h2 id="output"><span data-lang="zh">导出与验证</span><span data-lang="en">Export and verify</span></h2>
+      <ul>
+        <li><span data-lang="zh">索引按合并结果重算 <code>message_count</code>，<code>pinned</code> 统一为 <code>false</code>；</span><span data-lang="en">the index recomputes <code>message_count</code> and sets <code>pinned</code> to <code>false</code>;</span></li>
+        <li><span data-lang="zh">附件取各版本的并集，同路径优先较新版本；</span><span data-lang="en">attachments are the union of all versions, preferring the newer one on the same path;</span></li>
+        <li><span data-lang="zh">导出前按 chat-demo 规则校验，导出后复解析自检（首条目、顺序、CRC、索引一致性）；</span><span data-lang="en">validated against chat-demo's rules before export, then re-parsed afterwards (first entry, order, CRC, index consistency);</span></li>
+        <li><span data-lang="zh">导入 demo 会覆盖本地对话，先备份。</span><span data-lang="en">importing replaces the demo's local conversations — back up first.</span></li>
+      </ul>
+
+      <h2 id="pitfalls"><span data-lang="zh">四个常见坑</span><span data-lang="en">Four pitfalls</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>拿错包</strong>：一份是全量导出（几百组），另一份只含一个会话，列表当然显示几百组、而且几乎全是「仅 B」。</span><span data-lang="en"><strong>Wrong package</strong>: one export holds hundreds of conversations, the other one — the list then shows hundreds of rows, almost all marked “only B”.</span></li>
+        <li><span data-lang="zh"><strong>全选导出</strong>：默认会保持较多的勾选，只想合并某一组就切到「有差异」再单独勾。</span><span data-lang="en"><strong>Exporting everything</strong>: many rows stay selected by default; switch to “with differences” and tick just the conversation you mean.</span></li>
+        <li><span data-lang="zh"><strong>以为「仅一侧」被丢了</strong>：只在一边存在的消息会自动保留，不需要你选。</span><span data-lang="en"><strong>Thinking one-sided messages are dropped</strong>: they are kept automatically, no action needed.</span></li>
+        <li><span data-lang="zh"><strong>合并后条数变多</strong>：并集会包含未选中分支上的消息，所以数量可能大于任一单版本，这是正常的。</span><span data-lang="en"><strong>Message count grows</strong>: the union includes messages on unselected branches, so the total can exceed either version — expected.</span></li>
+      </ol>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="deepseek-export-structure.html">导出包结构</a> · <a href="keep-subset-of-chats.html">只保留部分对话</a> · <a href="merge-tool.html">打开版本合并器</a></span><span data-lang="en">Related: <a href="deepseek-export-structure.html">export structure</a> · <a href="keep-subset-of-chats.html">keeping a subset</a> · <a href="merge-tool.html">open the version merger</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

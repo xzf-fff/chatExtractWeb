@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>聊天记录导出交给谁：本地工具 vs 网盘 vs 在线转换 · ChatExtract</title>
+<meta name="description" content="整理 DeepSeek 聊天记录的三条路线对比：手工改 ZIP、网盘或在线转换站、本地浏览器工具。数据是否离开设备、要不要账号、怎么自己验证一个工具真的不上传。">
+<meta name="keywords" content="DeepSeek 聊天记录 隐私, 本地 导出 工具, 在线转换 风险, 不上传">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/local-vs-cloud-privacy.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/local-vs-cloud-privacy.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/local-vs-cloud-privacy.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/local-vs-cloud-privacy.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="聊天记录导出交给谁：本地工具 vs 网盘 vs 在线转换">
+<meta property="og:description" content="三条路线对比，以及怎么自己验证一个工具真的不上传。">
+<meta property="og:url" content="https://fastaibook.tech/local-vs-cloud-privacy.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: '聊天记录导出交给谁：本地工具 vs 网盘 vs 在线转换 · ChatExtract',
+    description: '三条路线对比：手工改 ZIP、网盘或在线转换站、本地浏览器工具；以及怎么自己验证一个工具真的不上传。'
+  },
+  en: {
+    title: 'Who gets your chat export: local tools vs cloud converters',
+    description: 'Three routes compared — editing the ZIP by hand, cloud converters, browser-local tools — and how to verify a tool really does not upload.'
+  }
+};
+</script>
+<script src="assets/i18n.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "聊天记录导出交给谁：本地工具 vs 网盘 vs 在线转换",
+  "description": "Local versus cloud tools for organising DeepSeek chat exports, and how to verify local processing.",
+  "inLanguage": ["zh-CN", "en"],
+  "url": "https://fastaibook.tech/local-vs-cloud-privacy.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["privacy", "DeepSeek export", "offline tools"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "隐私路线对比", "item": "https://fastaibook.tech/local-vs-cloud-privacy.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="index.html" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="index.html"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">聊天记录导出交给谁</span><span data-lang="en">Who gets your chat export</span></h1>
+    <p><span data-lang="zh">导出包里有你和 AI 的完整对话，很多时候还有截图。选哪种方式整理它，本质上是在选「谁有机会看到这些内容」。</span><span data-lang="en">An export contains your full conversation history — often with screenshots. How you process it decides who gets a chance to see it.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#routes"><span data-lang="zh">三条常见路线</span><span data-lang="en">Three routes</span></a>
+      <a href="#table"><span data-lang="zh">横向对比</span><span data-lang="en">Side by side</span></a>
+      <a href="#network"><span data-lang="zh">本地≠零请求</span><span data-lang="en">Local ≠ no requests</span></a>
+      <a href="#verify"><span data-lang="zh">怎么自己验证</span><span data-lang="en">How to verify</span></a>
+      <a href="#ours"><span data-lang="zh">本站的边界</span><span data-lang="en">Our boundaries</span></a>
+      <a href="#tips"><span data-lang="zh">几条实用建议</span><span data-lang="en">Practical tips</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="routes"><span data-lang="zh">三条常见路线</span><span data-lang="en">Three routes</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>手工改 ZIP</strong>：解压、删会话、改索引、重新压缩。数据不出本机，但容易踩条目顺序、索引一致性这些坑（见 <a href="fix.html">报错排查</a>）。</span><span data-lang="en"><strong>Edit the ZIP by hand</strong>: unzip, delete sessions, edit the index, re-zip. Data stays local, but entry order and index consistency are easy to break (see <a href="fix.html">troubleshooting</a>).</span></li>
+        <li><span data-lang="zh"><strong>网盘 / 在线转换站</strong>：把 ZIP 上传到某个服务，由它处理再给你下载。方便，但整包对话（含截图）已经离开了你的设备。</span><span data-lang="en"><strong>Cloud drive or online converter</strong>: upload the ZIP, let the service process it, download the result. Convenient — but the whole export, screenshots included, has left your machine.</span></li>
+        <li><span data-lang="zh"><strong>本地浏览器工具</strong>：页面在本地读文件、在内存里处理，只有你点下载时才写盘。门槛低、不用上传。</span><span data-lang="en"><strong>Browser-local tool</strong>: the page reads the file, processes it in memory and only writes to disk when you download. Low effort, no upload.</span></li>
+      </ol>
+
+      <h2 id="table"><span data-lang="zh">横向对比</span><span data-lang="en">Side by side</span></h2>
+      <table>
+        <thead>
+          <tr>
+            <th><span data-lang="zh">维度</span><span data-lang="en">Dimension</span></th>
+            <th><span data-lang="zh">手工改 ZIP</span><span data-lang="en">By hand</span></th>
+            <th><span data-lang="zh">网盘 / 在线站</span><span data-lang="en">Cloud</span></th>
+            <th><span data-lang="zh">本地浏览器工具</span><span data-lang="en">Local tool</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span data-lang="zh">对话内容是否离开设备</span><span data-lang="en">Leaves your device</span></td>
+            <td><span data-lang="zh">否</span><span data-lang="en">No</span></td>
+            <td><span data-lang="zh"><strong>是（整包上传）</strong></span><span data-lang="en"><strong>Yes, whole package</strong></span></td>
+            <td><span data-lang="zh">否</span><span data-lang="en">No</span></td>
+          </tr>
+          <tr>
+            <td><span data-lang="zh">需要账号</span><span data-lang="en">Account required</span></td>
+            <td><span data-lang="zh">否</span><span data-lang="en">No</span></td>
+            <td><span data-lang="zh">通常需要</span><span data-lang="en">Usually</span></td>
+            <td><span data-lang="zh">否</span><span data-lang="en">No</span></td>
+          </tr>
+          <tr>
+            <td><span data-lang="zh">服务器是否留副本</span><span data-lang="en">Server-side copy</span></td>
+            <td><span data-lang="zh">无</span><span data-lang="en">None</span></td>
+            <td><span data-lang="zh">可能保留（看条款）</span><span data-lang="en">Possibly, per their terms</span></td>
+            <td><span data-lang="zh">无</span><span data-lang="en">None</span></td>
+          </tr>
+          <tr>
+            <td><span data-lang="zh">能否断网使用</span><span data-lang="en">Works offline</span></td>
+            <td><span data-lang="zh">能</span><span data-lang="en">Yes</span></td>
+            <td><span data-lang="zh">不能</span><span data-lang="en">No</span></td>
+            <td><span data-lang="zh">能（保存页面到本地）</span><span data-lang="en">Yes, if saved locally</span></td>
+          </tr>
+          <tr>
+            <td><span data-lang="zh">出错概率</span><span data-lang="en">Chance of breaking it</span></td>
+            <td><span data-lang="zh">高（顺序/索引/编码）</span><span data-lang="en">High (order/index/encoding)</span></td>
+            <td><span data-lang="zh">中（黑盒，看不到过程）</span><span data-lang="en">Medium (black box)</span></td>
+            <td><span data-lang="zh">低（导出前校验+自检）</span><span data-lang="en">Low (validate + self-check)</span></td>
+          </tr>
+          <tr>
+            <td><span data-lang="zh">可审计性</span><span data-lang="en">Auditability</span></td>
+            <td><span data-lang="zh">你改的，你知道</span><span data-lang="en">You did it, you know</span></td>
+            <td><span data-lang="zh">通常不可</span><span data-lang="en">Usually not</span></td>
+            <td><span data-lang="zh">开源可读源码</span><span data-lang="en">Open source, readable</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 id="network"><span data-lang="zh">「本地工具」也会有网络请求</span><span data-lang="en">“Local” still makes network requests</span></h2>
+      <p><span data-lang="zh">要区分两件事：<strong>页面加载了什么</strong>，和<strong>你的文件有没有被送出去</strong>。一个纯前端工具完全可以带着广告或统计脚本，但它不需要、也不应该把你的 ZIP 上传到任何地方——上传文件需要主动写代码（<code>fetch</code> / <code>XMLHttpRequest</code> / <code>sendBeacon</code>）。</span><span data-lang="en">Separate two things: <strong>what the page loads</strong> and <strong>whether your file is sent anywhere</strong>. A front-end tool can carry ads or analytics and still never upload your ZIP — uploading requires deliberate code (<code>fetch</code> / <code>XMLHttpRequest</code> / <code>sendBeacon</code>).</span></p>
+
+      <h2 id="verify"><span data-lang="zh">怎么自己验证一个工具真的不上传</span><span data-lang="en">How to verify it yourself</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>断网测试</strong>：打开页面后拔网线/关 WiFi，再拖入导出包。如果处理流程照常走完，说明核心逻辑确实在本地。</span><span data-lang="en"><strong>Go offline</strong>: open the page, disconnect the network, then drop the export in. If processing still completes, the core logic is local.</span></li>
+        <li><span data-lang="zh"><strong>看 Network 面板</strong>：F12 → Network，操作一遍，筛选 <code>Fetch/XHR</code>，检查有没有请求把文件内容作为请求体发出去。</span><span data-lang="en"><strong>Watch the Network panel</strong>: F12 → Network, run through the flow, filter <code>Fetch/XHR</code>, and check whether any request carries file content.</span></li>
+        <li><span data-lang="zh"><strong>搜源码</strong>：开源工具直接搜 <code>fetch(</code>、<code>XMLHttpRequest</code>、<code>sendBeacon</code>、<code>FormData</code>，看有没有把 <code>File</code>/<code>Blob</code> 发出去。</span><span data-lang="en"><strong>Search the source</strong>: in an open-source tool, grep for <code>fetch(</code>, <code>XMLHttpRequest</code>, <code>sendBeacon</code>, <code>FormData</code> and check whether any <code>File</code>/<code>Blob</code> is sent.</span></li>
+        <li><span data-lang="zh"><strong>看隐私政策</strong>：有没有坦白列出第三方脚本（广告、统计）以及它们能拿到什么。</span><span data-lang="en"><strong>Read the privacy policy</strong>: does it list third-party scripts and what they can access?</span></li>
+      </ol>
+
+      <h2 id="ours"><span data-lang="zh">本站的边界，写清楚</span><span data-lang="en">Our own boundaries</span></h2>
+      <ul>
+        <li><span data-lang="zh">两个工具：文件只在浏览器内存里处理，不上传；<strong>工具页不加载任何广告或统计脚本</strong>。</span><span data-lang="en">The two tools process files in browser memory only; <strong>the tool pages load no ads or analytics</strong>.</span></li>
+        <li><span data-lang="zh">内容页（首页、指南、文章、报错、隐私）有 Google AdSense，会向 Google 请求广告并可能使用 Cookie——但它接触不到你选择的文件。</span><span data-lang="en">Content pages carry Google AdSense, which requests ads from Google and may use cookies — but has no access to the files you select.</span></li>
+        <li><span data-lang="zh">源码公开，上面四条验证方法都可以自己跑。</span><span data-lang="en">The source is public, so all four checks above can be run yourself.</span></li>
+      </ul>
+
+      <h2 id="tips"><span data-lang="zh">几条实用建议</span><span data-lang="en">Practical tips</span></h2>
+      <ul>
+        <li><span data-lang="zh">含敏感信息的对话，优先用本地方式处理，处理完把中间产物删掉。</span><span data-lang="en">For sensitive conversations, prefer local processing and delete intermediate files afterwards.</span></li>
+        <li><span data-lang="zh">分享前先裁剪（<a href="keep-subset-of-chats.html">只保留需要的会话</a>），并确认包里没有 <code>user.json</code>。</span><span data-lang="en">Trim before sharing (<a href="keep-subset-of-chats.html">keep only what's needed</a>) and make sure <code>user.json</code> is not inside.</span></li>
+        <li><span data-lang="zh">必须走网盘时，先加密压缩再上传，链接设有效期。</span><span data-lang="en">If you must use a cloud drive, encrypt the archive first and set an expiry on the link.</span></li>
+        <li><span data-lang="zh">截图类附件最容易泄露信息，逐张看过再决定要不要带出。</span><span data-lang="en">Screenshots leak the most; review them one by one before exporting.</span></li>
+      </ul>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="export-attachments.html">图片与附件</a> · <a href="privacy.html">隐私政策</a> · <a href="keep-subset-of-chats.html">只保留部分对话</a></span><span data-lang="en">Related: <a href="export-attachments.html">images and attachments</a> · <a href="privacy.html">privacy policy</a> · <a href="keep-subset-of-chats.html">keeping a subset</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

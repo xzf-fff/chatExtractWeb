@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<script>window.__FORCE_LANG__ = 'en';</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My DeepSeek export is huge — where the size goes and how to shrink it</title>
+<meta name="description" content="A DeepSeek export is often tens of MB, mostly images. Where the size goes, what actually helps, and what breaks the package.">
+<meta name="keywords" content="DeepSeek 导出 太大, 导出包 体积, 压缩 对话 导出, chat-demo 包 太大">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/en/export-size-optimization.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/export-size-optimization.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/export-size-optimization.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/export-size-optimization.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="My DeepSeek export is huge — where the size goes and how to shrink it">
+<meta property="og:description" content="A DeepSeek export is often tens of MB, mostly images. Where the size goes, what actually helps, and what breaks the package.">
+<meta property="og:url" content="https://fastaibook.tech/en/export-size-optimization.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'DeepSeek 导出包太大怎么办：体积来源与瘦身步骤 · ChatExtract',
+    description: '导出的 ZIP 几十 MB 很正常，大头通常是图片。体积花在哪、哪些瘦身手段有效、哪些做法反而会弄坏包。'
+  },
+  en: {
+    title: 'My DeepSeek export is huge — where the size goes and how to shrink it',
+    description: 'A DeepSeek export is often tens of MB, mostly images. Where the size goes, what actually helps, and what breaks the package.'
+  }
+};
+</script>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "DeepSeek 导出包太大怎么办",
+  "description": "Where the size of a DeepSeek export goes and how to shrink it safely.",
+  "inLanguage": ["en"],
+  "url": "https://fastaibook.tech/en/export-size-optimization.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["DeepSeek export", "file size", "chat-demo"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "导出包瘦身", "item": "https://fastaibook.tech/en/export-size-optimization.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="/en/" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">导出包太大怎么办</span><span data-lang="en">My export is huge</span></h1>
+    <p><span data-lang="zh">几百组对话的导出动辄几十 MB，绝大多数体积来自图片，而不是文字。想瘦身，得先知道花在哪。</span><span data-lang="en">A few hundred conversations easily reach tens of MB, and the bulk is images rather than text. To shrink it you first need to know where the weight is.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#where"><span data-lang="zh">体积花在哪</span><span data-lang="en">Where the size goes</span></a>
+      <a href="#effective"><span data-lang="zh">最有效的三招</span><span data-lang="en">Three effective moves</span></a>
+      <a href="#harmful"><span data-lang="zh">会让包变坏的做法</span><span data-lang="en">What breaks it</span></a>
+      <a href="#how-big"><span data-lang="zh">多大算大</span><span data-lang="en">How big is too big</span></a>
+      <a href="#steps"><span data-lang="zh">具体步骤</span><span data-lang="en">Steps</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="where"><span data-lang="zh">体积花在哪</span><span data-lang="en">Where the size goes</span></h2>
+      <p><span data-lang="zh">一个导出包里通常有三类内容：</span><span data-lang="en">An export holds three kinds of content:</span></p>
+      <ul>
+        <li><span data-lang="zh"><strong>会话 JSON</strong>：纯文本，几百组对话也就几 MB；压缩后更小。</span><span data-lang="en"><strong>Session JSON</strong>: plain text; a few hundred conversations amount to a few MB, less after compression.</span></li>
+        <li><span data-lang="zh"><strong>附件（图片）</strong>：通常是绝对大头。截图按原分辨率保存，单张几百 KB 到 1 MB 很常见。</span><span data-lang="en"><strong>Attachments (images)</strong>: usually the dominant cost. Screenshots are stored at full resolution; 0.3–1 MB each is normal.</span></li>
+        <li><span data-lang="zh"><strong>索引与 manifest</strong>：可忽略，几十 KB。</span><span data-lang="en"><strong>Index and manifest</strong>: negligible, tens of KB.</span></li>
+      </ul>
+      <p><span data-lang="zh">经验值：带图的会话往往只占会话总数的个位数百分比，却能占掉 80% 以上的体积。</span><span data-lang="en">Rule of thumb: image-bearing conversations are often a single-digit percentage of the total, yet account for over 80% of the bytes.</span></p>
+
+      <h2 id="effective"><span data-lang="zh">最有效的三招</span><span data-lang="en">Three effective moves</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>只勾选需要的会话</strong>——这是唯一真正有效的大杠杆。导入 demo 本来就是「整包替换」，你不需要的对话留着只会占体积。</span><span data-lang="en"><strong>Select only what you need</strong> — the only large lever that exists. Import replaces everything anyway, so unneeded conversations just add weight.</span></li>
+        <li><span data-lang="zh"><strong>先看清哪些会话带图</strong>：用「带图片」筛选，去掉不重要的带图会话，往往一次就能砍掉一半以上。</span><span data-lang="en"><strong>See which conversations carry images</strong>: filter by “images” and drop the unimportant ones — often halves the package in one pass.</span></li>
+        <li><span data-lang="zh"><strong>不要包含账号信息</strong>：<code>user.json</code> 很小，但含账号标识，默认不要带出去（勾选项默认关闭）。</span><span data-lang="en"><strong>Leave account info out</strong>: <code>user.json</code> is small but identifies your account; it is off by default.</span></li>
+      </ol>
+
+      <h2 id="harmful"><span data-lang="zh">会让你白忙或把包弄坏的做法</span><span data-lang="en">What wastes effort or breaks the package</span></h2>
+      <ul>
+        <li><span data-lang="zh"><strong>用系统压缩工具再压一次</strong>：JPEG/PNG 已经压缩过，二次压缩几乎不省体积，却会打乱 ZIP 条目顺序 → 「无法识别该文件」。</span><span data-lang="en"><strong>Re-zipping with the OS archiver</strong>: images are already compressed, so you save almost nothing while reordering ZIP entries → “unrecognized file”.</span></li>
+        <li><span data-lang="zh"><strong>批量重压缩图片</strong>：会改变文件字节，某些情况下与包内记录的尺寸/大小不一致，徒增风险；想省空间不如直接不选那些会话。</span><span data-lang="en"><strong>Batch re-compressing images</strong>: changes bytes and can disagree with the recorded dimensions/size, adding risk for little gain — dropping those conversations is simpler.</span></li>
+        <li><span data-lang="zh"><strong>手工删附件文件</strong>：正文里的 <code>export_path</code> 还指着它，导入后图片全裂（见 <a href="fix.html">附件数据已损坏</a>）。</span><span data-lang="en"><strong>Deleting attachment files by hand</strong>: <code>export_path</code> still points at them, so every image breaks (see <a href="fix.html">corrupt attachment</a>).</span></li>
+      </ul>
+
+      <h2 id="how-big"><span data-lang="zh">多大算大</span><span data-lang="en">How big is too big</span></h2>
+      <p><span data-lang="zh">几十 MB 完全正常，浏览器处理起来没有压力。真正需要留意的是**几百 MB 以上**：所有处理都在内存里完成，超大包可能让标签页卡顿甚至崩溃。如果只是想看几组对话，没必要把整包导入。</span><span data-lang="en">Tens of MB is normal and the browser handles it fine. The concern starts at <strong>hundreds of MB</strong>: everything is processed in memory, and very large packages can make the tab sluggish or crash. If you only need a few conversations, don't import the whole archive.</span></p>
+
+      <h2 id="steps"><span data-lang="zh">具体步骤</span><span data-lang="en">Steps</span></h2>
+      <ol>
+        <li><span data-lang="zh">打开 <a href="/en/subset-tool.html">子集提取器</a>，载入全量导出；</span><span data-lang="en">open the <a href="/en/subset-tool.html">subset extractor</a> and load the full export;</span></li>
+        <li><span data-lang="zh">用「带图片」筛选看一眼哪些会话最占体积；</span><span data-lang="en">filter by “images” to see which conversations are heaviest;</span></li>
+        <li><span data-lang="zh">按标题搜索出真正需要的会话并勾选，其余清空；</span><span data-lang="en">search for the ones you actually need, tick them, clear the rest;</span></li>
+        <li><span data-lang="zh">底部会实时显示「原始体积」，确认在可接受范围；</span><span data-lang="en">the footer shows the running size — check it is acceptable;</span></li>
+        <li><span data-lang="zh">生成 ZIP 并自检通过后下载。</span><span data-lang="en">generate the ZIP, let the self-check pass, download.</span></li>
+      </ol>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="export-attachments.html">图片与附件</a> · <a href="keep-subset-of-chats.html">只保留部分对话</a> · <a href="what-is-chat-demo.html">chat-demo 是什么</a></span><span data-lang="en">Related: <a href="export-attachments.html">images and attachments</a> · <a href="keep-subset-of-chats.html">keeping a subset</a> · <a href="what-is-chat-demo.html">what is chat-demo</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="/en/">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="/en/guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

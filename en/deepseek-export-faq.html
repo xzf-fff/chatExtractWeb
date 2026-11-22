@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<script>window.__FORCE_LANG__ = 'en';</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeepSeek export FAQ</title>
+<meta name="description" content="Ten common questions about DeepSeek chat exports: what is included, keeping a subset, why imports overwrite, missing images, merging two exports.">
+<meta name="keywords" content="DeepSeek 导出 常见问题, DeepSeek 导出 包含什么, 导出 部分对话, 导入 chat-demo">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/en/deepseek-export-faq.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/deepseek-export-faq.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/deepseek-export-faq.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/deepseek-export-faq.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="DeepSeek export FAQ">
+<meta property="og:description" content="Ten common questions about DeepSeek chat exports: what is included, keeping a subset, why imports overwrite, missing images, merging two exports.">
+<meta property="og:url" content="https://fastaibook.tech/en/deepseek-export-faq.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'DeepSeek 导出常见问题：包含什么、能否部分导出、怎么导入 chat-demo · ChatExtract',
+    description: '关于 DeepSeek 对话导出的 10 个常见问题：导出包含什么、能否只导出部分、为什么导入会覆盖、图片为什么丢失、两份导出能否合并。'
+  },
+  en: {
+    title: 'DeepSeek export FAQ',
+    description: 'Ten common questions about DeepSeek chat exports: what is included, keeping a subset, why imports overwrite, missing images, merging two exports.'
+  }
+};
+</script>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "DeepSeek 导出的数据里包含什么？",
+      "acceptedAnswer": { "@type": "Answer", "text": "包含 manifest.json（格式声明）、可选的 user.json（账号信息）、chat_session_index.json（会话索引）、chat_sessions/<id>.json（每个会话的完整消息树），以及 chat_sessions/<id>_files/ 下的图片等附件。不含你未上传的内容，也不含账号密码。" }
+    },
+    {
+      "@type": "Question",
+      "name": "已删除的对话会出现在导出里吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "不会。导出只包含导出时刻仍然存在的会话。反过来要注意：每次导出会重新编排会话内的消息 id，删过消息后后面的 id 会整体前移。" }
+    },
+    {
+      "@type": "Question",
+      "name": "能只导出其中几组对话吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "官方导出是全量的。要只保留几组，需要用本仓库的子集提取器：载入导出、勾选需要的会话、生成新的 ZIP——它会同时裁剪会话文件和索引，保证能被 chat-demo 导入。" }
+    },
+    {
+      "@type": "Question",
+      "name": "为什么导入 chat-demo 会覆盖已有对话？",
+      "acceptedAnswer": { "@type": "Answer", "text": "chat-demo 的导入是「整包替换」语义：先清空本地对话与附件，再写入包内内容。导入前请先在 demo 里「导出所有历史对话」备份。" }
+    },
+    {
+      "@type": "Question",
+      "name": "导入后图片为什么不显示？",
+      "acceptedAnswer": { "@type": "Answer", "text": "通常是附件没有跟着会话一起打包，或 FILE 片段里的 export_path 与包内实际路径不一致。附件必须保持在 chat_sessions/<会话 id>_files/ 下且不改名。" }
+    },
+    {
+      "@type": "Question",
+      "name": "两份导出可以合并吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "可以。按会话 id 分组、按消息 id 对齐后取并集：同一条消息内容一致就复用较新版本，内容不同则由你选择保留哪一版。注意两份导出之间的消息 id 可能被重排，合并工具会先按正文序列对齐。" }
+    },
+    {
+      "@type": "Question",
+      "name": "导出的 ZIP 能直接打开查看吗？",
+      "acceptedAnswer": { "@type": "Answer", "text": "能解压，但里面的 JSON 是给程序读的，人工浏览很不直观。更实际的做法是导入 chat-demo，用界面浏览会话、图片与分支。" }
+    },
+    {
+      "@type": "Question",
+      "name": "多久导出一次比较好？",
+      "acceptedAnswer": { "@type": "Answer", "text": "建议每月一次，以及在清理对话、换设备、做重要合并之前各一次。导出是本地操作，不消耗积分，多做几次备份成本很低。" }
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "导出常见问题", "item": "https://fastaibook.tech/en/deepseek-export-faq.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="/en/" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">DeepSeek 导出常见问题</span><span data-lang="en">DeepSeek export FAQ</span></h1>
+    <p><span data-lang="zh">关于导出的 10 个高频问题，每个都给短答案 + 指向细节页。</span><span data-lang="en">Ten frequently asked questions, each with a short answer and a pointer to the details.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#q1"><span data-lang="zh">包含什么</span><span data-lang="en">What's inside</span></a>
+      <a href="#q2"><span data-lang="zh">已删除的对话</span><span data-lang="en">Deleted chats</span></a>
+      <a href="#q3"><span data-lang="zh">只导出几组</span><span data-lang="en">Partial export</span></a>
+      <a href="#q4"><span data-lang="zh">格式会变吗</span><span data-lang="en">Format version</span></a>
+      <a href="#q5"><span data-lang="zh">为什么覆盖</span><span data-lang="en">Why overwrite</span></a>
+      <a href="#q6"><span data-lang="zh">图片丢失</span><span data-lang="en">Missing images</span></a>
+      <a href="#q7"><span data-lang="zh">能否合并</span><span data-lang="en">Merging</span></a>
+      <a href="#q8"><span data-lang="zh">能直接看吗</span><span data-lang="en">Reading it</span></a>
+      <a href="#q9"><span data-lang="zh">多久导一次</span><span data-lang="en">How often</span></a>
+      <a href="#q10"><span data-lang="zh">安全吗</span><span data-lang="en">Is it safe</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="q1"><span data-lang="zh">1. 导出的数据里包含什么？</span><span data-lang="en">1. What is inside?</span></h2>
+      <p><span data-lang="zh">manifest（格式声明）、可选的 user.json（账号信息）、会话索引、每个会话的完整消息树，以及 <code>_files/</code> 下的图片附件。不含账号密码。结构详见 <a href="deepseek-export-structure.html">导出包结构</a>。</span><span data-lang="en">A manifest, optional user.json, the index, every conversation's message tree and the images under <code>_files/</code>. No passwords. See <a href="deepseek-export-structure.html">the structure article</a>.</span></p>
+
+      <h2 id="q2"><span data-lang="zh">2. 已删除的对话会出现在导出里吗？</span><span data-lang="en">2. Do deleted conversations appear?</span></h2>
+      <p><span data-lang="zh">不会——导出只包含当时的现存会话。但要注意：删过消息后，**后续消息 id 会整体前移**，所以两份导出的 id 可能对不上（见 <a href="merge-deepseek-exports.html">合并</a>）。</span><span data-lang="en">No — only what exists at export time. Note, however, that deleting messages <strong>shifts later ids</strong>, so two exports may disagree on ids (see <a href="merge-deepseek-exports.html">merging</a>).</span></p>
+
+      <h2 id="q3"><span data-lang="zh">3. 能只导出其中几组对话吗？</span><span data-lang="en">3. Can I export only a few conversations?</span></h2>
+      <p><span data-lang="zh">官方导出是全量的。要只留几组，用 <a href="/en/subset-tool.html">子集提取器</a> 勾选后重新打包——它会同时裁剪会话和索引。步骤见 <a href="keep-subset-of-chats.html">只保留部分对话</a>。</span><span data-lang="en">The official export is all-or-nothing. To keep a few, use the <a href="/en/subset-tool.html">subset extractor</a>, which prunes sessions and the index together. Steps in <a href="keep-subset-of-chats.html">keeping a subset</a>.</span></p>
+
+      <h2 id="q4"><span data-lang="zh">4. 导出格式会变吗？</span><span data-lang="en">4. Can the format change?</span></h2>
+      <p><span data-lang="zh">目前是 <code>export_format_version: 3</code>。如果官方升级格式，本工具也需要同步调整；导入时若版本不匹配会直接报错。</span><span data-lang="en">It is currently <code>export_format_version: 3</code>. If the format changes, these tools would need updating too; a mismatch fails the import immediately.</span></p>
+
+      <h2 id="q5"><span data-lang="zh">5. 为什么导入 chat-demo 会覆盖已有对话？</span><span data-lang="en">5. Why does importing overwrite?</span></h2>
+      <p><span data-lang="zh">导入是「整包替换」：先清空本地对话与附件，再写入包内。导入前先在 demo 里「导出所有历史对话」备份。</span><span data-lang="en">Import replaces everything: local conversations and attachments are cleared, then the package is written. Export your history inside the demo first.</span></p>
+
+      <h2 id="q6"><span data-lang="zh">6. 导入后图片为什么不显示？</span><span data-lang="en">6. Why are images missing after import?</span></h2>
+      <p><span data-lang="zh">附件没跟着打包，或 <code>export_path</code> 与实际路径不一致。保持 <code>chat_sessions/&lt;id&gt;_files/</code> 原样复制即可，详见 <a href="export-attachments.html">图片与附件</a>。</span><span data-lang="en">Attachments weren't packed, or <code>export_path</code> doesn't match. Copy <code>chat_sessions/&lt;id&gt;_files/</code> verbatim — see <a href="export-attachments.html">images and attachments</a>.</span></p>
+
+      <h2 id="q7"><span data-lang="zh">7. 两份导出可以合并吗？</span><span data-lang="en">7. Can two exports be merged?</span></h2>
+      <p><span data-lang="zh">可以。按会话 id 分组、按消息对齐取并集，内容不同的逐条选择。细节见 <a href="merge-deepseek-exports.html">两次导出怎么合并</a>。</span><span data-lang="en">Yes. Group by conversation id, align by message, union them, and resolve conflicts one by one. See <a href="merge-deepseek-exports.html">merging two exports</a>.</span></p>
+
+      <h2 id="q8"><span data-lang="zh">8. 导出的 ZIP 能直接打开查看吗？</span><span data-lang="en">8. Can I just open the ZIP?</span></h2>
+      <p><span data-lang="zh">能解压，但 JSON 是给程序读的。想浏览对话，导入 <a href="what-is-chat-demo.html">chat-demo</a> 更实际。</span><span data-lang="en">You can unzip it, but the JSON is machine-oriented. Importing into <a href="what-is-chat-demo.html">chat-demo</a> is the practical way to browse.</span></p>
+
+      <h2 id="q9"><span data-lang="zh">9. 多久导出一次比较好？</span><span data-lang="en">9. How often should I export?</span></h2>
+      <p><span data-lang="zh">每月一次，加上清理对话、换设备、重要合并之前各一次。备份成本很低，丢数据成本很高；见 <a href="chat-demo-backup-migrate.html">备份与迁移</a>。</span><span data-lang="en">Monthly, plus before cleaning up conversations, switching devices or an important merge. See <a href="chat-demo-backup-migrate.html">backup and migration</a>.</span></p>
+
+      <h2 id="q10"><span data-lang="zh">10. 导出数据安全吗？</span><span data-lang="en">10. Is the export safe?</span></h2>
+      <p><span data-lang="zh">导出包里有完整对话和截图，本身就等于一份聊天记录存档。建议用本地工具处理、分享前裁剪、不要上传到公共网盘；见 <a href="local-vs-cloud-privacy.html">本地 vs 网盘</a>。</span><span data-lang="en">The package is a full chat archive including screenshots. Process it locally, trim before sharing, and avoid public drives — see <a href="local-vs-cloud-privacy.html">local vs cloud</a>.</span></p>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="deepseek-export-structure.html">结构</a> · <a href="export-size-optimization.html">瘦身</a> · <a href="fix.html">报错排查</a></span><span data-lang="en">Related: <a href="deepseek-export-structure.html">structure</a> · <a href="export-size-optimization.html">size</a> · <a href="fix.html">troubleshooting</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="/en/">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="/en/guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -5,6 +5,7 @@ output/
 
 # 内部文件
 .codebuddy/
+promo-drafts.md
 
 # 系统杂项
 .DS_Store

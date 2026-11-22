@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeepSeek 导出包结构详解：manifest / 索引 / 会话 JSON / 附件 · ChatExtract</title>
+<meta name="description" content="拆解 DeepSeek 导出的 ZIP：manifest.json 为什么必须第一个、chat_session_index.json 与 chat_sessions 的关系、消息树里的 parent_id 与 current_message_id、附件 export_path，以及三条常见误解。">
+<meta name="keywords" content="DeepSeek 导出 结构, export_format_version 3, chat_session_index.json, chat_sessions, 消息树 parent_id">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/deepseek-export-structure.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/deepseek-export-structure.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/deepseek-export-structure.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/deepseek-export-structure.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="DeepSeek 导出包结构详解">
+<meta property="og:description" content="manifest、索引、会话 JSON、附件各负责什么，消息树怎么串起来。">
+<meta property="og:url" content="https://fastaibook.tech/deepseek-export-structure.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'DeepSeek 导出包结构详解：manifest / 索引 / 会话 JSON / 附件 · ChatExtract',
+    description: '拆解 DeepSeek 导出的 ZIP：manifest.json 为什么必须第一个、索引与会话文件的关系、消息树里的 parent_id 与 current_message_id、附件 export_path。'
+  },
+  en: {
+    title: 'Inside a DeepSeek export: manifest, index, sessions, attachments',
+    description: 'A tour of the DeepSeek export ZIP: why manifest.json must be first, how the index relates to session files, the message tree behind parent_id, and attachment export_path.'
+  }
+};
+</script>
+<script src="assets/i18n.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "DeepSeek 导出包结构详解",
+  "description": "Structure of a DeepSeek chat export: manifest, index, session JSON, attachments and the message tree.",
+  "inLanguage": ["zh-CN", "en"],
+  "url": "https://fastaibook.tech/deepseek-export-structure.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["DeepSeek export", "chat-demo", "export_format_version"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "导出包结构详解", "item": "https://fastaibook.tech/deepseek-export-structure.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="index.html" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="index.html"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">DeepSeek 导出包结构详解</span><span data-lang="en">Inside a DeepSeek export</span></h1>
+    <p><span data-lang="zh">把导出 ZIP 解压后只有四类文件，但它们的顺序、命名和互相引用关系都很讲究——chat-demo 的多数导入报错都能从这里找到解释。</span><span data-lang="en">An unpacked export contains just four kinds of files, but their order, naming and cross-references are strict — which explains most chat-demo import errors.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#tree"><span data-lang="zh">目录结构</span><span data-lang="en">Layout</span></a>
+      <a href="#manifest"><span data-lang="zh">manifest 必须第一个</span><span data-lang="en">Manifest first</span></a>
+      <a href="#index"><span data-lang="zh">索引不是正文</span><span data-lang="en">Index vs sessions</span></a>
+      <a href="#session"><span data-lang="zh">会话是一棵消息树</span><span data-lang="en">The message tree</span></a>
+      <a href="#files"><span data-lang="zh">附件与 export_path</span><span data-lang="en">Attachments</span></a>
+      <a href="#myths"><span data-lang="zh">三个常见误解</span><span data-lang="en">Three myths</span></a>
+      <a href="#rules"><span data-lang="zh">四条底线</span><span data-lang="en">Four rules</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="tree"><span data-lang="zh">目录结构</span><span data-lang="en">Layout</span></h2>
+      <pre><code>deepseek_data-YYYY-MM-DD/
+├── manifest.json              # 格式声明
+├── user.json                  # 可选：账号信息
+├── chat_session_index.json    # 会话索引（顶层数组）
+└── chat_sessions/
+    ├── &lt;session-id&gt;.json      # 单个会话正文
+    └── &lt;session-id&gt;_files/    # 该会话的附件（图片等）</code></pre>
+      <p><span data-lang="zh">四类文件各管一件事：声明格式、列出有哪些会话、存放每个会话的正文、存放正文引用的附件。理解这个分工，就能理解为什么“只删掉几个会话文件”一定会导入失败。</span><span data-lang="en">Four roles: declare the format, list the conversations, store each conversation, store the attachments they reference. Once you see the split, it is obvious why deleting a few session files always breaks the import.</span></p>
+
+      <h2 id="manifest"><span data-lang="zh">manifest.json：为什么它必须是第一个条目</span><span data-lang="en">manifest.json: why it must be the first entry</span></h2>
+      <p><span data-lang="zh">内容只有一行：<code>{"export_format_version":3}</code>。chat-demo 是**按条目流**解析 ZIP 的，读到第一个条目就判断“这是不是我认识的格式”，所以 manifest 一旦不在第一位，就会直接报「无法识别该文件」。</span><span data-lang="en">It holds one line: <code>{"export_format_version":3}</code>. chat-demo parses the ZIP as a stream and decides from the first entry whether it recognises the format, so a manifest anywhere else produces “unrecognized file”.</span></p>
+      <p><span data-lang="zh">用系统自带的“右键 → 压缩”重新打包，条目顺序通常会被打乱——这是最常见的自己坑自己。</span><span data-lang="en">Re-zipping with the OS “Compress” command usually reorders entries — the most common self-inflicted failure.</span></p>
+
+      <h2 id="index"><span data-lang="zh">chat_session_index.json：只是索引，不是正文</span><span data-lang="en">chat_session_index.json: an index, not content</span></h2>
+      <p><span data-lang="zh">顶层是数组，每项形如：</span><span data-lang="en">A top-level array whose entries look like:</span></p>
+      <pre><code>{"id":"&lt;uuid&gt;","title":"会话标题","pinned":false,
+ "message_count":52,
+ "inserted_at":"2026-11-16T14:07:12.136Z",
+ "updated_at":"2026-11-18T05:07:08.400Z"}</code></pre>
+      <ul>
+        <li><span data-lang="zh"><code>id</code> 必须与 <code>chat_sessions/&lt;id&gt;.json</code> 的文件名一一对应，两个集合必须**完全相等**；</span><span data-lang="en"><code>id</code> must map one-to-one to <code>chat_sessions/&lt;id&gt;.json</code>; the two sets must be <strong>exactly equal</strong>.</span></li>
+        <li><span data-lang="zh"><code>message_count</code> 是冗余字段，只是给列表显示用；合并、裁剪后要按实际消息数重算。</span><span data-lang="en"><code>message_count</code> is redundant — used for the list view, and must be recomputed after merging or pruning.</span></li>
+        <li><span data-lang="zh"><code>updated_at</code> 决定默认排序，取错了会让列表顺序很怪。</span><span data-lang="en"><code>updated_at</code> drives the default sort order.</span></li>
+      </ul>
+
+      <h2 id="session"><span data-lang="zh">会话是一棵消息树</span><span data-lang="en">A conversation is a message tree</span></h2>
+      <p><span data-lang="zh">每个会话 JSON 里有 <code>messages[]</code> 和两个关键指针：每条消息的 <code>parent_id</code>，以及会话级的 <code>current_message_id</code>。前者把消息串成树（同一个 <code>parent_id</code> 下可以挂多条消息 → 分支），后者决定 demo 打开时显示哪条分支的末端。</span><span data-lang="en">Each session has <code>messages[]</code> plus two pointers: each message's <code>parent_id</code> builds the tree (several messages may share a parent → branches), and the session-level <code>current_message_id</code> decides which branch end the demo opens.</span></p>
+      <pre><code>"messages": [
+  {"id":1,"parent_id":null,"role":"USER","status":"FINISHED",
+   "fragments":[{"type":"REQUEST","content":"…"}]},
+  {"id":2,"parent_id":1,"role":"ASSISTANT","status":"FINISHED",
+   "fragments":[{"type":"RESPONSE","content":"…"}]}
+],
+"current_message_id": 2</code></pre>
+      <p><span data-lang="zh">片段（<code>fragments</code>）按类型区分：<code>REQUEST</code>/<code>RESPONSE</code> 是正文，<code>THINK</code> 是思考过程，<code>TOOL_SEARCH</code>/<code>READ_LINK</code> 是联网与阅读，<code>FILE</code> 是附件，<code>CONTENT_RISK</code> 是系统提示。想判断两条消息“内容是否相同”，比的就是这些片段。</span><span data-lang="en">Fragments carry the payload: <code>REQUEST</code>/<code>RESPONSE</code> for text, <code>THINK</code> for reasoning, <code>TOOL_SEARCH</code>/<code>READ_LINK</code> for web activity, <code>FILE</code> for attachments, <code>CONTENT_RISK</code> for system notices. Comparing fragments is how you decide whether two messages are “the same”.</span></p>
+      <p><span data-lang="zh"><strong>改消息一定要同步这两处</strong>：删掉一条消息却留着指向它的 <code>parent_id</code>，就会报「消息分支已损坏」。</span><span data-lang="en"><strong>Always fix both pointers</strong>: delete a message while something still points at it and you get “message branch is broken”.</span></p>
+
+      <h2 id="files"><span data-lang="zh">附件与 export_path</span><span data-lang="en">Attachments and export_path</span></h2>
+      <p><span data-lang="zh"><code>FILE</code> 片段的 <code>files[]</code> 里有 <code>export_path</code>，形如 <code>chat_sessions/&lt;会话 id&gt;_files/&lt;fileId&gt;_&lt;文件名&gt;</code>。这个字符串就是包内真实路径，必须逐字一致；文件名含中文等非 ASCII 字符时，demo 会直接拒收整个包。</span><span data-lang="en">A <code>FILE</code> fragment's <code>files[]</code> carries <code>export_path</code> such as <code>chat_sessions/&lt;session-id&gt;_files/&lt;fileId&gt;_&lt;name&gt;</code>. That string is the real path inside the archive and must match verbatim; non-ASCII names make the demo reject the whole package.</span></p>
+
+      <h2 id="myths"><span data-lang="zh">三个常见误解</span><span data-lang="en">Three myths</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>「消息 id 是稳定标识」</strong>——不是。每次导出会重新编排 id，删过消息后后面的 id 整体前移；跨导出按 id 对比会整段错位。</span><span data-lang="en"><strong>“Message ids are stable”</strong> — no. Every export renumbers ids; deleting messages shifts later ones, so comparing two exports by id misaligns whole stretches.</span></li>
+        <li><span data-lang="zh"><strong>「改正文就够了」</strong>——改完还要保证 <code>parent_id</code>、<code>current_message_id</code> 仍然指向存在的消息，时间戳仍是 <code>YYYY-MM-DDTHH:MM:SS.mmmZ</code>。</span><span data-lang="en"><strong>“Editing text is enough”</strong> — you must also keep <code>parent_id</code>/<code>current_message_id</code> pointing at existing messages and timestamps in <code>YYYY-MM-DDTHH:MM:SS.mmmZ</code>.</span></li>
+        <li><span data-lang="zh"><strong>「索引可以手工留着」</strong>——裁剪会话文件时必须同步裁剪索引，否则报「文件内容不完整」。</span><span data-lang="en"><strong>“The index can stay as is”</strong> — pruning sessions requires pruning the index too, otherwise “incomplete content”.</span></li>
+      </ol>
+
+      <h2 id="rules"><span data-lang="zh">想自己改包，至少守住四条</span><span data-lang="en">Four rules if you edit by hand</span></h2>
+      <ol>
+        <li><span data-lang="zh"><code>manifest.json</code> 永远是第一个条目；</span><span data-lang="en"><code>manifest.json</code> stays first.</span></li>
+        <li><span data-lang="zh">索引的 id 集合 = 包内会话文件 id 集合；</span><span data-lang="en">Index ids = packaged session ids.</span></li>
+        <li><span data-lang="zh">附件路径原样复制，不改名；</span><span data-lang="en">Copy attachment paths verbatim.</span></li>
+        <li><span data-lang="zh">时间戳格式、<code>role</code>/<code>status</code> 枚举、父链自洽。</span><span data-lang="en">Timestamps, <code>role</code>/<code>status</code> enums, consistent parent links.</span></li>
+      </ol>
+      <p><span data-lang="zh">四条都满足，包就能导入；任何一条不满足，chat-demo 只会给一句笼统的报错。用 <a href="subset-tool.html">子集提取器</a> 或 <a href="merge-tool.html">版本合并器</a> 打包时，这四条会在导出前自动校验、导出后自动复解析，不用你记。</span><span data-lang="en">Meet all four and it imports; miss one and chat-demo only gives a generic error. The <a href="subset-tool.html">subset extractor</a> and <a href="merge-tool.html">version merger</a> validate all four before export and re-parse the result afterwards, so you don't have to remember them.</span></p>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="keep-subset-of-chats.html">只保留部分对话</a> · <a href="merge-deepseek-exports.html">合并两次导出</a> · <a href="fix.html">导入报错排查</a></span><span data-lang="en">Related: <a href="keep-subset-of-chats.html">keep a subset</a> · <a href="merge-deepseek-exports.html">merge two exports</a> · <a href="fix.html">import troubleshooting</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

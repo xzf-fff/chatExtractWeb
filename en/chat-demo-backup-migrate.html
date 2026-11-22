@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<script>window.__FORCE_LANG__ = 'en';</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Backing up and migrating chat-demo data</title>
+<meta name="description" content="chat-demo keeps conversations in your current browser, not in your account. How to back up before switching machines and restore afterwards.">
+<meta name="keywords" content="chat-demo 备份, chat-demo 数据迁移, 导出所有历史对话, 浏览器 数据 丢失">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/en/chat-demo-backup-migrate.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/chat-demo-backup-migrate.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/chat-demo-backup-migrate.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/chat-demo-backup-migrate.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="Backing up and migrating chat-demo data">
+<meta property="og:description" content="chat-demo keeps conversations in your current browser, not in your account. How to back up before switching machines and restore afterwards.">
+<meta property="og:url" content="https://fastaibook.tech/en/chat-demo-backup-migrate.html">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/assets/icon-192.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="stylesheet" href="/assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'chat-demo 的数据怎么备份与迁移：换电脑、换浏览器前必看 · ChatExtract',
+    description: 'chat-demo 的对话存在当前浏览器里，不跟账号走。换机前怎么备份、换机后怎么恢复。'
+  },
+  en: {
+    title: 'Backing up and migrating chat-demo data',
+    description: 'chat-demo keeps conversations in your current browser, not in your account. How to back up before switching machines and restore afterwards.'
+  }
+};
+</script>
+<script src="/assets/i18n.js" defer></script>
+<script src="/assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "chat-demo 的数据怎么备份与迁移",
+  "description": "Backing up and migrating chat-demo data between machines and browsers.",
+  "inLanguage": ["en"],
+  "url": "https://fastaibook.tech/en/chat-demo-backup-migrate.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["chat-demo", "backup", "migration"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "备份与迁移", "item": "https://fastaibook.tech/en/chat-demo-backup-migrate.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="/en/" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">chat-demo 的数据怎么备份与迁移</span><span data-lang="en">Backing up and migrating chat-demo data</span></h1>
+    <p><span data-lang="zh">chat-demo 的对话存在**你当前这个浏览器**里，不跟任何账号走。换电脑、换浏览器、清理网站数据之前，先导出一份 ZIP。</span><span data-lang="en">chat-demo stores conversations <strong>in the browser you are using</strong>, not in an account. Before switching machines, switching browsers or clearing site data, export a ZIP.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#where"><span data-lang="zh">数据存在哪</span><span data-lang="en">Where the data lives</span></a>
+      <a href="#backup"><span data-lang="zh">怎么备份</span><span data-lang="en">How to back up</span></a>
+      <a href="#restore"><span data-lang="zh">怎么迁移恢复</span><span data-lang="en">How to restore</span></a>
+      <a href="#loss"><span data-lang="zh">什么时候会丢</span><span data-lang="en">When data is lost</span></a>
+      <a href="#tools"><span data-lang="zh">用工具做更细的备份</span><span data-lang="en">Finer-grained backups</span></a>
+      <a href="#safety"><span data-lang="zh">存放注意</span><span data-lang="en">Storing safely</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="where"><span data-lang="zh">数据存在哪</span><span data-lang="en">Where the data lives</span></h2>
+      <ul>
+        <li><span data-lang="zh">chat-demo 是纯前端静态站，数据保存在**当前浏览器的本地存储**里（通常是 IndexedDB）。</span><span data-lang="en">chat-demo is a static front-end; data lives in <strong>this browser's local storage</strong> (typically IndexedDB).</span></li>
+        <li><span data-lang="zh">它不等同于你 DeepSeek 账号里的云端对话——导入、删除、清理都只影响当前浏览器。</span><span data-lang="en">It is unrelated to your DeepSeek account's cloud conversations — imports, deletions and clearing affect only this browser.</span></li>
+        <li><span data-lang="zh">不同浏览器、不同设备之间**不共享**；无痕窗口关闭即清空。</span><span data-lang="en">Nothing is shared across browsers or devices, and incognito windows drop everything on close.</span></li>
+      </ul>
+
+      <h2 id="backup"><span data-lang="zh">怎么备份</span><span data-lang="en">How to back up</span></h2>
+      <ol>
+        <li><span data-lang="zh">打开 chat-demo，进入「设置 → 数据管理」；</span><span data-lang="en">open chat-demo, go to “Settings → Data”;</span></li>
+        <li><span data-lang="zh">点「导出所有历史对话」，得到一个 ZIP（结构与 DeepSeek 官方导出一致）；</span><span data-lang="en">click “Export all history” to get a ZIP with the same structure as an official export;</span></li>
+        <li><span data-lang="zh">把 ZIP 存到本地文件夹（需要跨设备就放到你信任的存储，见最后一节）。</span><span data-lang="en">keep it in a local folder (or trusted storage if you need it on another device — see the last section).</span></li>
+      </ol>
+      <p><span data-lang="zh">建议节奏：**每次大批导入前**、**每月一次**、**换设备前**各备份一次。备份成本很低，丢数据成本很高。</span><span data-lang="en">Suggested rhythm: before any large import, once a month, and before switching devices. Backups are cheap, data loss is not.</span></p>
+
+      <h2 id="restore"><span data-lang="zh">怎么迁移恢复</span><span data-lang="en">How to restore</span></h2>
+      <ol>
+        <li><span data-lang="zh">在新设备/新浏览器打开同一个 chat-demo 地址；</span><span data-lang="en">open the same chat-demo URL on the new device or browser;</span></li>
+        <li><span data-lang="zh">「设置 → 数据管理 → 导入历史对话」，选择备份的 ZIP；</span><span data-lang="en">“Settings → Data → Import history”, pick the backup ZIP;</span></li>
+        <li><span data-lang="zh">核对会话数量与图片是否正常。</span><span data-lang="en">check the conversation count and that images render.</span></li>
+      </ol>
+      <p><span data-lang="zh"><strong>导入是整包替换</strong>：如果目标浏览器里已经有对话，会先被清空。所以「先备份，再导入」是必须的顺序。</span><span data-lang="en"><strong>Import replaces everything</strong>: whatever is already in the target browser is wiped first. Always back up before importing.</span></p>
+
+      <h2 id="loss"><span data-lang="zh">什么时候会丢数据</span><span data-lang="en">When data is lost</span></h2>
+      <ul>
+        <li><span data-lang="zh">清理浏览器「网站数据 / Cookie 及网站数据」；</span><span data-lang="en">clearing “site data / cookies and site data”;</span></li>
+        <li><span data-lang="zh">换浏览器或换设备（存储不互通）；</span><span data-lang="en">switching browser or device (storage is separate);</span></li>
+        <li><span data-lang="zh">使用无痕/隐私窗口；</span><span data-lang="en">using incognito or private windows;</span></li>
+        <li><span data-lang="zh">导入一个新的 ZIP（覆盖）；</span><span data-lang="en">importing another ZIP (overwrites);</span></li>
+        <li><span data-lang="zh">浏览器处于空间不足或「退出时清除数据」的设置下。</span><span data-lang="en">low storage, or a browser configured to clear data on exit.</span></li>
+      </ul>
+
+      <h2 id="tools"><span data-lang="zh">用工具做更细的备份</span><span data-lang="en">Finer-grained backups</span></h2>
+      <ul>
+        <li><span data-lang="zh">只想保留一部分：用 <a href="/en/subset-tool.html">子集提取器</a> 从备份 ZIP 里挑出需要的会话，体积更小。</span><span data-lang="en">Keep only part of it: use the <a href="/en/subset-tool.html">subset extractor</a> to pull out the conversations you need — much smaller.</span></li>
+        <li><span data-lang="zh">两次备份需要合并：用 <a href="/en/merge-tool.html">版本合并器</a> 按消息对齐取并集（见 <a href="merge-deepseek-exports.html">合并两次导出</a>）。</span><span data-lang="en">Merge two backups: the <a href="/en/merge-tool.html">version merger</a> aligns by message and unions them (see <a href="merge-deepseek-exports.html">merging exports</a>).</span></li>
+        <li><span data-lang="zh">想确认备份包本身没坏：导入到另一个浏览器验证一次即可。</span><span data-lang="en">To confirm a backup is intact, import it into another browser once.</span></li>
+      </ul>
+
+      <h2 id="safety"><span data-lang="zh">存放注意</span><span data-lang="en">Storing safely</span></h2>
+      <p><span data-lang="zh">备份 ZIP 里有完整对话和你上传过的图片（常含截图），等同于一份聊天记录存档。放网盘前建议先加密压缩、链接设有效期；不要把备份传到公共群或公开仓库。详见 <a href="local-vs-cloud-privacy.html">本地 vs 网盘</a> 与 <a href="privacy.html">隐私政策</a>。</span><span data-lang="en">A backup ZIP contains your full conversations and images (often screenshots) — it is a complete chat archive. Encrypt it before uploading to a cloud drive, set link expiry, and never post it to public groups or repositories. See <a href="local-vs-cloud-privacy.html">local vs cloud</a> and the <a href="privacy.html">privacy policy</a>.</span></p>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="what-is-chat-demo.html">chat-demo 是什么</a> · <a href="export-size-optimization.html">导出包瘦身</a> · <a href="fix.html">报错排查</a></span><span data-lang="en">Related: <a href="what-is-chat-demo.html">what is chat-demo</a> · <a href="export-size-optimization.html">shrinking an export</a> · <a href="fix.html">troubleshooting</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="/en/">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="/en/guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

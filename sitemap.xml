@@ -109,4 +109,184 @@
     <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/privacy.html"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/privacy.html"/>
   </url>
+<url>
+    <loc>https://fastaibook.tech/articles.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/articles.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/articles.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/articles.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/articles.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/articles.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/articles.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/articles.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/deepseek-export-structure.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/deepseek-export-structure.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/deepseek-export-structure.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/deepseek-export-structure.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/deepseek-export-structure.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/deepseek-export-structure.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/deepseek-export-structure.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/deepseek-export-structure.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/keep-subset-of-chats.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/keep-subset-of-chats.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/keep-subset-of-chats.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/keep-subset-of-chats.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/keep-subset-of-chats.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/keep-subset-of-chats.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/keep-subset-of-chats.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/keep-subset-of-chats.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/merge-deepseek-exports.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/merge-deepseek-exports.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/merge-deepseek-exports.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/merge-deepseek-exports.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/merge-deepseek-exports.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/merge-deepseek-exports.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/merge-deepseek-exports.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/merge-deepseek-exports.html"/>
+  </url>
+<url>
+    <loc>https://fastaibook.tech/export-attachments.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/export-attachments.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/export-attachments.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/export-attachments.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/export-attachments.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/export-attachments.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/export-attachments.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/export-attachments.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/local-vs-cloud-privacy.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/local-vs-cloud-privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/local-vs-cloud-privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/local-vs-cloud-privacy.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/local-vs-cloud-privacy.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/local-vs-cloud-privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/local-vs-cloud-privacy.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/local-vs-cloud-privacy.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/what-is-chat-demo.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/what-is-chat-demo.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/what-is-chat-demo.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/what-is-chat-demo.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/what-is-chat-demo.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/what-is-chat-demo.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/what-is-chat-demo.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/what-is-chat-demo.html"/>
+  </url>
+<url>
+    <loc>https://fastaibook.tech/export-size-optimization.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/export-size-optimization.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/export-size-optimization.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/export-size-optimization.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/export-size-optimization.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/export-size-optimization.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/export-size-optimization.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/export-size-optimization.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/chat-demo-backup-migrate.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/chat-demo-backup-migrate.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/chat-demo-backup-migrate.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/chat-demo-backup-migrate.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/chat-demo-backup-migrate.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/chat-demo-backup-migrate.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/chat-demo-backup-migrate.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/chat-demo-backup-migrate.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/deepseek-export-faq.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/deepseek-export-faq.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/deepseek-export-faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/deepseek-export-faq.html"/>
+  </url>
+  <url>
+    <loc>https://fastaibook.tech/en/deepseek-export-faq.html</loc>
+    <lastmod>2026-11-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/deepseek-export-faq.html"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/deepseek-export-faq.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/deepseek-export-faq.html"/>
+  </url>
 </urlset>

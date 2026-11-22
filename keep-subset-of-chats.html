@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>只保留部分 DeepSeek 对话并导入 chat-demo：完整步骤 · ChatExtract</title>
+<meta name="description" content="从几百组 DeepSeek 对话里只保留需要的几组：载入、检索、预览、勾选、校验、导出，再导入 chat-demo。含同名标题、带图片会话、体积控制三个易错点。">
+<meta name="keywords" content="DeepSeek 导出 只保留 几个对话, chat-demo 导入 子集, 裁剪 对话 导出">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/keep-subset-of-chats.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/keep-subset-of-chats.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/keep-subset-of-chats.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/keep-subset-of-chats.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="只保留部分 DeepSeek 对话并导入 chat-demo">
+<meta property="og:description" content="载入、检索、预览、勾选、校验、导出的完整步骤，以及三个易错点。">
+<meta property="og:url" content="https://fastaibook.tech/keep-subset-of-chats.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: '只保留部分 DeepSeek 对话并导入 chat-demo：完整步骤 · ChatExtract',
+    description: '从几百组 DeepSeek 对话里只保留需要的几组：载入、检索、预览、勾选、校验、导出，再导入 chat-demo。'
+  },
+  en: {
+    title: 'Keep only some DeepSeek conversations and import them into chat-demo',
+    description: 'Load, search, preview, select, validate and export a subset of your DeepSeek conversations, then import it into chat-demo.'
+  }
+};
+</script>
+<script src="assets/i18n.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "只保留部分 DeepSeek 对话并导入 chat-demo",
+  "description": "How to keep a subset of DeepSeek conversations and import them into chat-demo.",
+  "inLanguage": ["zh-CN", "en"],
+  "url": "https://fastaibook.tech/keep-subset-of-chats.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["DeepSeek export", "chat-demo", "subset"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "只保留部分对话", "item": "https://fastaibook.tech/keep-subset-of-chats.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="index.html" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="index.html"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">只保留部分对话并导入 chat-demo</span><span data-lang="en">Keep only some conversations</span></h1>
+    <p><span data-lang="zh">chat-demo 的导入是「整包替换」，不是「追加」。想要 3 组对话，包内就必须只有 3 组——这篇是从全量导出裁出子集的完整流程。</span><span data-lang="en">chat-demo's import replaces everything rather than appending. To end up with three conversations, the package must contain exactly those three — this is the full workflow.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#why"><span data-lang="zh">为什么不能直接导入</span><span data-lang="en">Why not import as-is</span></a>
+      <a href="#prepare"><span data-lang="zh">准备工作</span><span data-lang="en">Preparation</span></a>
+      <a href="#steps"><span data-lang="zh">六步走完</span><span data-lang="en">Six steps</span></a>
+      <a href="#traps"><span data-lang="zh">三个易错点</span><span data-lang="en">Three traps</span></a>
+      <a href="#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+      <a href="#manual"><span data-lang="zh">手工裁剪为什么不建议</span><span data-lang="en">Why not by hand</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="why"><span data-lang="zh">为什么不能直接导入原始导出</span><span data-lang="en">Why not import the export as-is</span></h2>
+      <p><span data-lang="zh">两个原因叠在一起：</span><span data-lang="en">Two reasons stack up:</span></p>
+      <ol>
+        <li><span data-lang="zh"><strong>导入会覆盖</strong>：chat-demo 导入时会清掉本地已有对话，再写入包内的；所以包里有多少组，导入后就有多少组。</span><span data-lang="en"><strong>Import replaces</strong>: the demo clears local conversations and writes what is in the package, so the package size becomes your library size.</span></li>
+        <li><span data-lang="zh"><strong>索引必须一致</strong>：包内索引的会话 id 集合必须与 <code>chat_sessions/*.json</code> 完全相等。想只留几组，就必须同时裁会话文件和索引。</span><span data-lang="en"><strong>The index must match</strong>: its id set has to equal the packaged <code>chat_sessions/*.json</code>. Keeping a few conversations means pruning both files and index.</span></li>
+      </ol>
+
+      <h2 id="prepare"><span data-lang="zh">准备工作</span><span data-lang="en">Preparation</span></h2>
+      <ul>
+        <li><span data-lang="zh">从 DeepSeek 的「设置 → 数据管理 → 导出」拿到 ZIP，解压与否都可以（工具两种都能读）。</span><span data-lang="en">Get the ZIP from DeepSeek's “Settings → Data → Export”; zipped or unzipped both work.</span></li>
+        <li><span data-lang="zh">如果你想保留 demo 里现有对话，先在 demo 里「导出所有历史对话」备份——导入会覆盖。</span><span data-lang="en">If the demo already holds conversations you need, export them first — the import overwrites.</span></li>
+        <li><span data-lang="zh">浏览器用 Chrome / Edge 最新版（Safari 不支持选择本地文件夹）。</span><span data-lang="en">Use the latest Chrome or Edge (Safari cannot pick folders).</span></li>
+      </ul>
+
+      <h2 id="steps"><span data-lang="zh">六步走完</span><span data-lang="en">Six steps</span></h2>
+      <ol>
+        <li><span data-lang="zh"><strong>载入</strong>：打开 <a href="subset-tool.html">子集提取器</a>，把导出文件夹或 ZIP 拖进页面（或点右上角按钮）。载入成功后顶部会显示「N 组对话 · M 张图片」。</span><span data-lang="en"><strong>Load</strong>: open the <a href="subset-tool.html">subset extractor</a> and drop the folder or ZIP (or use the buttons). The header then shows “N conversations · M images”.</span></li>
+        <li><span data-lang="zh"><strong>检索</strong>：搜索框按标题过滤（忽略大小写、全半角与多余空格，快捷键 <code>/</code>）；可按最近更新 / 消息数 / 标题排序；可按「带图片 / 重名 / 已选」筛选。</span><span data-lang="en"><strong>Search</strong>: filter titles case- and width-insensitively (<code>/</code> focuses the box); sort by recency, message count or title; filter by images, duplicate titles or selection.</span></li>
+        <li><span data-lang="zh"><strong>预览</strong>：点标题看正文、思考过程与图片，确认是不是你要的那一组。</span><span data-lang="en"><strong>Preview</strong>: open a conversation to check the text, thinking steps and images.</span></li>
+        <li><span data-lang="zh"><strong>勾选</strong>：点行首方框选中。表头的「全选当前 / 反选 / 清空」只作用于**当前筛选结果**。</span><span data-lang="en"><strong>Select</strong>: tick the checkbox on each row. “Select all / Invert / Clear” apply to the <strong>current filter result</strong>.</span></li>
+        <li><span data-lang="zh"><strong>校验</strong>：底部实时显示状态。错误会阻止导出并指出具体会话；警告可以继续。</span><span data-lang="en"><strong>Validate</strong>: the footer shows live status. Errors block export and name the conversation; warnings let you continue.</span></li>
+        <li><span data-lang="zh"><strong>导出</strong>：点「生成 ZIP」，工具会在浏览器里复解析成品做自检（首条目、顺序、CRC、索引一致性），通过后再点一次下载。</span><span data-lang="en"><strong>Export</strong>: click “Generate ZIP”; the tool re-parses the result (first entry, order, CRC, index consistency) and only then offers the download.</span></li>
+      </ol>
+
+      <h2 id="traps"><span data-lang="zh">三个易错点</span><span data-lang="en">Three traps</span></h2>
+      <ul>
+        <li><span data-lang="zh"><strong>同名标题</strong>：数据里存在多组同名对话（例如都叫「SFTP使用指南」），列表会全部列出，用更新时间区分；只想要其中一条就单独勾那个。</span><span data-lang="en"><strong>Duplicate titles</strong>: several conversations may share a title; they all appear, distinguished by update time. Tick only the one you want.</span></li>
+        <li><span data-lang="zh"><strong>带图片的会话</strong>：附件必须跟会话一起打包，否则导入后图片全裂。可以先用「带图片」筛选确认哪些会话有附件。</span><span data-lang="en"><strong>Conversations with images</strong>: attachments must be packed with the session or images break after import. Filter by “images” to spot them.</span></li>
+        <li><span data-lang="zh"><strong>体积</strong>：勾得越多包越大，底部会实时算已选体积；几十组带截图的对话很容易到几十 MB。</span><span data-lang="en"><strong>Size</strong>: the more you tick the bigger the ZIP; the footer shows the running total. A few dozen screenshot-heavy conversations can easily reach tens of MB.</span></li>
+      </ul>
+
+      <h2 id="import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></h2>
+      <ol>
+        <li><span data-lang="zh">打开官方 chat-demo：<a href="https://deepseek-ai.github.io/chat-demo/" target="_blank" rel="noopener">deepseek-ai.github.io/chat-demo</a>；</span><span data-lang="en">Open the official chat-demo: <a href="https://deepseek-ai.github.io/chat-demo/" target="_blank" rel="noopener">deepseek-ai.github.io/chat-demo</a>;</span></li>
+        <li><span data-lang="zh">进入「设置 → 数据管理 → 导入历史对话」，选刚下载的 ZIP；</span><span data-lang="en">go to “Settings → Data → Import history” and pick the ZIP;</span></li>
+        <li><span data-lang="zh">导入后核对：会话数量应与你勾选的一致，点开确认图片正常显示。</span><span data-lang="en">after importing, check the count matches your selection and that images render.</span></li>
+      </ol>
+
+      <h2 id="manual"><span data-lang="zh">手工裁剪为什么不建议</span><span data-lang="en">Why not prune by hand</span></h2>
+      <p><span data-lang="zh">要手工做对，你必须同时：让 <code>manifest.json</code> 留在第一位、把索引裁到与会话文件一致、按正确顺序重写 ZIP、保持附件路径逐字不变、维持时间戳与 <code>role</code>/<code>status</code> 枚举合法。任何一步出错，chat-demo 只会回一句笼统的「文件内容不完整」。具体约束见 <a href="deepseek-export-structure.html">导出包结构详解</a> 与 <a href="fix.html">报错排查</a>。</span><span data-lang="en">By hand you must keep <code>manifest.json</code> first, prune the index to match the session files, rewrite the ZIP in the right order, keep every attachment path byte-identical, and keep timestamps and <code>role</code>/<code>status</code> enums valid. Miss one and you get a generic “incomplete content”. See <a href="deepseek-export-structure.html">the export structure</a> and <a href="fix.html">troubleshooting</a>.</span></p>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="deepseek-export-structure.html">导出包结构</a> · <a href="merge-deepseek-exports.html">合并两次导出</a> · <a href="guide.html">使用指南</a></span><span data-lang="en">Related: <a href="deepseek-export-structure.html">export structure</a> · <a href="merge-deepseek-exports.html">merging exports</a> · <a href="guide.html">guide</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

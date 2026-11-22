@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light" data-i18n-nav="1">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DeepSeek 导出里的图片和附件怎么处理：路径、丢失与打包 · ChatExtract</title>
+<meta name="description" content="DeepSeek 导出包里的图片存在哪里、FILE 片段的 export_path 怎么引用、为什么导入后图片会裂开、中文文件名为什么不行，以及导出时附件该怎么打包。">
+<meta name="keywords" content="DeepSeek 导出 图片, 附件 export_path, chat-demo 图片 丢失, chat_sessions _files">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://fastaibook.tech/export-attachments.html">
+<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/export-attachments.html">
+<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/export-attachments.html">
+<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/export-attachments.html">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="ChatExtract">
+<meta property="og:title" content="导出里的图片和附件怎么处理">
+<meta property="og:description" content="export_path 怎么引用附件、为什么图片会裂开、导出时该怎么打包。">
+<meta property="og:url" content="https://fastaibook.tech/export-attachments.html">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image" content="https://fastaibook.tech/assets/og.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="stylesheet" href="assets/site.css">
+<script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
+<script>
+window.PAGE_META = {
+  zh: {
+    title: 'DeepSeek 导出里的图片和附件怎么处理：路径、丢失与打包 · ChatExtract',
+    description: '图片存在哪里、export_path 怎么引用、为什么导入后图片会裂开、中文文件名为什么不行。'
+  },
+  en: {
+    title: 'Images and attachments in a DeepSeek export',
+    description: 'Where images live, how export_path references them, why images break after import, and how to package attachments.'
+  }
+};
+</script>
+<script src="assets/i18n.js" defer></script>
+<script src="assets/theme.js" defer></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "DeepSeek 导出里的图片和附件怎么处理",
+  "description": "Attachments in a DeepSeek export: paths, export_path references, and packaging rules.",
+  "inLanguage": ["zh-CN", "en"],
+  "url": "https://fastaibook.tech/export-attachments.html",
+  "isPartOf": { "@type": "WebSite", "name": "ChatExtract", "url": "https://fastaibook.tech/" },
+  "about": ["DeepSeek export", "attachments", "chat-demo"]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "ChatExtract", "item": "https://fastaibook.tech/" },
+    { "@type": "ListItem", "position": 2, "name": "文章", "item": "https://fastaibook.tech/articles.html" },
+    { "@type": "ListItem", "position": 3, "name": "图片与附件", "item": "https://fastaibook.tech/export-attachments.html" }
+  ]
+}
+</script>
+<meta name="google-adsense-account" content="ca-pub-1356569540907713">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1356569540907713" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header class="site-nav">
+  <a class="logo" href="index.html" aria-label="ChatExtract home">
+    <span class="logo-mark" aria-hidden="true">C</span>
+    <span class="logo-word">ChatExtract</span>
+  </a>
+  <nav class="nav-links" aria-label="Main navigation">
+    <a href="index.html"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
+    <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+    <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+    <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+  </nav>
+  <div class="nav-right">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang-btn="zh" aria-pressed="true">中文</button>
+      <button type="button" data-lang-btn="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="icon-btn" href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener" aria-label="GitHub 源码" title="GitHub 源码">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <button class="icon-btn" type="button" data-theme-toggle aria-label="Switch theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="doc-hero">
+  <div class="container">
+    <h1><span data-lang="zh">导出里的图片和附件怎么处理</span><span data-lang="en">Images and attachments in an export</span></h1>
+    <p><span data-lang="zh">对话正文是 JSON，图片是独立文件。两者靠一个字符串（<code>export_path</code>）相连——这正是导入后「图片全裂」最常见的原因。</span><span data-lang="en">Text lives in JSON, images live as separate files, and a single string (<code>export_path</code>) connects them — which is exactly why images often break after import.</span></p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="doc-layout">
+    <aside class="toc" aria-label="On this page">
+      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
+      <a href="#where"><span data-lang="zh">附件存在哪里</span><span data-lang="en">Where files live</span></a>
+      <a href="#ref"><span data-lang="zh">export_path 是什么</span><span data-lang="en">What export_path is</span></a>
+      <a href="#broken"><span data-lang="zh">图片为什么会裂</span><span data-lang="en">Why images break</span></a>
+      <a href="#rules"><span data-lang="zh">打包时的四条规则</span><span data-lang="en">Four packaging rules</span></a>
+      <a href="#size"><span data-lang="zh">体积与实际数量</span><span data-lang="en">Size in practice</span></a>
+      <a href="#privacy"><span data-lang="zh">分享前注意</span><span data-lang="en">Before sharing</span></a>
+    </aside>
+
+    <article class="doc-body">
+      <h2 id="where"><span data-lang="zh">附件存在哪里</span><span data-lang="en">Where files live</span></h2>
+      <p><span data-lang="zh">每个会话一个目录，命名规则固定：</span><span data-lang="en">Each conversation gets one folder, named by convention:</span></p>
+      <pre><code>chat_sessions/
+├── &lt;session-id&gt;.json          # 会话正文
+└── &lt;session-id&gt;_files/        # 这个会话的所有附件
+    ├── &lt;fileId&gt;_image.png
+    └── &lt;fileId&gt;_image.png</code></pre>
+      <p><span data-lang="zh">文件名前缀是文件 id（UUID），后缀是原始文件名。图片通常叫 <code>image.png</code>，所以同一个会话里会出现很多同名文件——靠 fileId 前缀区分。</span><span data-lang="en">The prefix is the file id (a UUID) and the suffix is the original name. Images are usually called <code>image.png</code>, so a conversation can contain many same-named files distinguished only by the id prefix.</span></p>
+
+      <h2 id="ref"><span data-lang="zh">export_path 是什么</span><span data-lang="en">What export_path is</span></h2>
+      <p><span data-lang="zh">消息里的附件不是二进制，而是一个 <code>FILE</code> 片段，里面列出文件元信息：</span><span data-lang="en">Attachments inside a message are not binary data but a <code>FILE</code> fragment listing metadata:</span></p>
+      <pre><code>{"type":"FILE","files":[
+  {"id":"d4108600-…","file_name":"image.png",
+   "export_path":"chat_sessions/&lt;session-id&gt;_files/d4108600-…_image.png",
+   "file_size":142341,"is_image":true,"width":1400,"height":985}
+]}</code></pre>
+      <p><span data-lang="zh"><code>export_path</code> 是包内相对路径，必须与真实文件位置**逐字一致**。它是唯一把「消息」和「文件」连起来的线索——写错一个字符，图片就读不到。</span><span data-lang="en"><code>export_path</code> is the relative path inside the archive and must match the real file location <strong>verbatim</strong>. It is the only link between a message and its file; one wrong character and the image cannot be loaded.</span></p>
+
+      <h2 id="broken"><span data-lang="zh">图片为什么会裂</span><span data-lang="en">Why images break</span></h2>
+      <ul>
+        <li><span data-lang="zh"><strong>只拷了 JSON</strong>：把 <code>chat_sessions/*.json</code> 打包却漏了 <code>_files/</code>，正文能看、图片全空。</span><span data-lang="en"><strong>Only the JSON was copied</strong>: packing <code>chat_sessions/*.json</code> without <code>_files/</code> keeps text but leaves every image blank.</span></li>
+        <li><span data-lang="zh"><strong>路径被改写</strong>：把文件挪进别的目录、或重新命名后没同步 <code>export_path</code>。</span><span data-lang="en"><strong>Paths were rewritten</strong>: moving or renaming files without updating <code>export_path</code>.</span></li>
+        <li><span data-lang="zh"><strong>文件大小写不一致</strong>：Windows 不区分大小写，导入端区分。</span><span data-lang="en"><strong>Case mismatch</strong>: Windows ignores case, the importer does not.</span></li>
+        <li><span data-lang="zh"><strong>非 ASCII 文件名</strong>：中文文件名会让 chat-demo 拒绝整个包（它的 ZIP 解析器不接受非 ASCII 条目名）。</span><span data-lang="en"><strong>Non-ASCII names</strong>: Chinese filenames make chat-demo reject the whole package — its ZIP parser refuses non-ASCII entry names.</span></li>
+        <li><span data-lang="zh"><strong>合并时漏取并集</strong>：两份导出的附件分属不同目录，只打包其中一份就会缺图。</span><span data-lang="en"><strong>Merge took only one side</strong>: attachments live in per-export folders, so packing one side loses the other's images.</span></li>
+      </ul>
+
+      <h2 id="rules"><span data-lang="zh">打包时的四条规则</span><span data-lang="en">Four packaging rules</span></h2>
+      <ol>
+        <li><span data-lang="zh">附件必须和会话一起打包，路径保持 <code>chat_sessions/&lt;id&gt;_files/&lt;文件名&gt;</code>；</span><span data-lang="en">Pack attachments with their conversation, keeping <code>chat_sessions/&lt;id&gt;_files/&lt;name&gt;</code>;</span></li>
+        <li><span data-lang="zh">不改名、不移动、不重新压缩图片；</span><span data-lang="en">never rename, move or recompress them;</span></li>
+        <li><span data-lang="zh">条目名只能是 ASCII 字符；</span><span data-lang="en">entry names must be ASCII only;</span></li>
+        <li><span data-lang="zh">合并多份导出时，附件按路径取并集（同路径优先较新版本）。</span><span data-lang="en">when merging exports, union attachments by path (prefer the newer version on the same path).</span></li>
+      </ol>
+      <p><span data-lang="zh"><a href="subset-tool.html">子集提取器</a> 在导出前会检查每个 <code>export_path</code> 是否以该会话的 <code>_files/</code> 开头、文件是否真的存在、名字是否 ASCII；<a href="merge-tool.html">版本合并器</a> 会把各版本的附件目录取并集。任何一项不满足都会阻止导出并指出是哪个会话。</span><span data-lang="en">The <a href="subset-tool.html">subset extractor</a> checks that every <code>export_path</code> starts with that conversation's <code>_files/</code>, that the file exists and that the name is ASCII; the <a href="merge-tool.html">version merger</a> unions attachment folders across versions. Any failure blocks the export and names the conversation.</span></p>
+
+      <h2 id="size"><span data-lang="zh">体积与实际数量</span><span data-lang="en">Size in practice</span></h2>
+      <p><span data-lang="zh">图片是导出包里最占体积的部分：一份几百组对话的导出里，带图的会话可能只有个位数，但图片本身常有几十 MB（截图按原尺寸保存）。勾选时工具会实时显示「原始体积」，几十组带截图会对体积影响很大。</span><span data-lang="en">Images dominate package size: a several-hundred-conversation export may have only a handful of image-bearing chats, yet the images alone can run to tens of MB at full resolution. The tool shows the running size while you select.</span></p>
+
+      <h2 id="privacy"><span data-lang="zh">分享前注意</span><span data-lang="en">Before sharing</span></h2>
+      <p><span data-lang="zh">导出里的图片绝大多数是聊天截图，可能包含手机号、地址、账户界面等个人信息。生成的 ZIP 会把这些图片原样带出——分享到群聊或公共网盘前请逐张确认，或先用工具只挑需要的会话。</span><span data-lang="en">Most exported images are screenshots that may contain phone numbers, addresses or account screens. The ZIP carries them verbatim, so review them before sharing to group chats or public drives — or select only the conversations you need.</span></p>
+
+      <p style="color:var(--tx3);font-size:13px"><span data-lang="zh">相关：<a href="deepseek-export-structure.html">导出包结构</a> · <a href="keep-subset-of-chats.html">只保留部分对话</a> · <a href="fix.html">附件数据已损坏</a></span><span data-lang="en">Related: <a href="deepseek-export-structure.html">export structure</a> · <a href="keep-subset-of-chats.html">keeping a subset</a> · <a href="fix.html">corrupt attachment</a></span></p>
+    </article>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <a class="logo" href="index.html">
+          <span class="logo-mark" aria-hidden="true">C</span>
+          <span class="logo-word">ChatExtract</span>
+        </a>
+        <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
+          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
+        </p>
+      </div>
+      <div>
+        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
+        <a href="subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
+        <a href="merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
+        <a href="guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+      </div>
+      <div>
+        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
+        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
+        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
+        <a href="guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+      </div>
+      <div class="footer-note">
+        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span>ChatExtract</span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
