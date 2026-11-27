@@ -322,11 +322,8 @@ dialog::backdrop{background:rgba(4,8,14,.72);backdrop-filter:blur(3px)}
 </style>
 <meta name="description" content="Merge two exports of the same DeepSeek conversation by message id, resolve conflicts, pick a branch head and export a ZIP that imports into chat-demo.">
 <meta name="keywords" content="DeepSeek 对话合并, 版本冲突, 消息分支, chat-demo 导入, 对话导出">
-<meta name="robots" content="index,follow">
+<meta name="robots" content="noindex,follow">
 <link rel="canonical" href="https://fastaibook.tech/en/merge-tool.html">
-<link rel="alternate" hreflang="zh-CN" href="https://fastaibook.tech/merge-tool.html">
-<link rel="alternate" hreflang="en" href="https://fastaibook.tech/en/merge-tool.html">
-<link rel="alternate" hreflang="x-default" href="https://fastaibook.tech/merge-tool.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ChatExtract">
 <meta property="og:title" content="Version merger · ChatExtract">
@@ -350,7 +347,6 @@ dialog::backdrop{background:rgba(4,8,14,.72);backdrop-filter:blur(3px)}
 <script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
 <script>
 window.PAGE_META = {
-  zh: { title: '对话版本合并器 · ChatExtract', description: '合并两次导出的同一组对话：按消息 id 对齐、逐条解决冲突、选择当前分支，导出可直接导入 chat-demo 的 ZIP。' },
   en: { title: 'Version merger · ChatExtract', description: 'Merge two exports of the same DeepSeek conversation by message id, resolve conflicts, pick a branch head and export a ZIP that imports into chat-demo.' }
 };
 </script>
@@ -389,12 +385,12 @@ window.PAGE_META = {
     <span class="logo-word">ChatExtract</span>
   </a>
   <nav class="nav-links" aria-label="Main navigation">
-    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
-    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
-    <a href="/en/merge-tool.html" aria-current="page"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
-    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
-      <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
-  <a href="articles.html"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+    <a href="/en/"><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html" aria-current="page"><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="en">Guide</span></a>
+      <a href="/en/fix.html"><span data-lang="en">Troubleshooting</span></a>
+  <a href="/en/articles.html"><span data-lang="en">Articles</span></a>
   </nav>
   <div class="nav-right">
     <div class="lang-switch" role="group" aria-label="Language">
@@ -452,10 +448,10 @@ window.PAGE_META = {
 
     <div class="sb-about">
       <h2>关于对话版本合并器</h2>
-      <p data-lang="zh">同一组对话在不同日期各导出过一次时，把两份数据按消息内容对齐，逐条解决正文冲突、重选当前分支，再重算索引与附件，导出可直接导入 chat-demo 的 ZIP。即使两份导出的消息 id 被重排过也能自动纠正。全程在浏览器本地完成，不上传任何数据。</p>
+      
       <p data-lang="en">When the same conversation was exported on two different dates, this tool aligns both copies by message content, lets you resolve each conflict and pick the current branch, then recomputes the index and attachments and exports a ZIP that imports into chat-demo. Renumbered message ids between exports are corrected automatically. Everything runs locally; no data is uploaded.</p>
-      <p data-lang="zh"><a href="privacy.html">隐私政策</a> · <a href="/en/guide.html#import">导入说明</a></p>
-      <p data-lang="en"><a href="privacy.html">Privacy policy</a> · <a href="/en/guide.html#import">Import guide</a></p>
+      
+      <p data-lang="en"><a href="/en/privacy.html">Privacy policy</a> · <a href="/en/guide.html#import">Import guide</a></p>
     </div>
   </aside>
 

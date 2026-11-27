@@ -33,10 +33,6 @@
 <script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
 <script>
 window.PAGE_META = {
-  zh: {
-    title: '文章 · ChatExtract（DeepSeek 导出结构 / 挑选子集 / 合并版本）',
-    description: '关于 DeepSeek 对话导出与 chat-demo 导入的实用文章：导出包结构详解、如何只保留部分对话、两次导出怎么合并、常见报错排查。'
-  },
   en: {
     title: 'Articles · ChatExtract',
     description: 'Practical articles about DeepSeek chat exports and chat-demo imports: export structure, keeping a subset, merging two exports, troubleshooting import errors.'
@@ -81,12 +77,12 @@ window.PAGE_META = {
     <span class="logo-word">ChatExtract</span>
   </a>
   <nav class="nav-links" aria-label="Main navigation">
-    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
-    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
-    <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
-    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
-    <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
-    <a href="articles.html" aria-current="page"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+    <a href="/en/"><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html"><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="en">Guide</span></a>
+    <a href="/en/fix.html"><span data-lang="en">Troubleshooting</span></a>
+    <a href="/en/articles.html" aria-current="page"><span data-lang="en">Articles</span></a>
   </nav>
   <div class="nav-right">
     <div class="lang-switch" role="group" aria-label="Language">
@@ -104,62 +100,62 @@ window.PAGE_META = {
 
 <div class="doc-hero">
   <div class="container">
-    <h1><span data-lang="zh">文章</span><span data-lang="en">Articles</span></h1>
-    <p><span data-lang="zh">把「DeepSeek 导出的数据到底长什么样、怎么挑、怎么合并、为什么导不进去」讲清楚。</span><span data-lang="en">What a DeepSeek export actually contains, how to keep a subset, how to merge two exports, and why imports fail.</span></p>
+    <h1><span data-lang="en">Articles</span></h1>
+    <p><span data-lang="en">What a DeepSeek export actually contains, how to keep a subset, how to merge two exports, and why imports fail.</span></p>
   </div>
 </div>
 
 <div class="container">
   <div class="doc-layout">
     <aside class="toc" aria-label="On this page">
-      <div class="toc-title"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></div>
-      <a href="#structure"><span data-lang="zh">导出包结构详解</span><span data-lang="en">Export structure</span></a>
-      <a href="#subset"><span data-lang="zh">只保留部分对话</span><span data-lang="en">Keep a subset</span></a>
-      <a href="#merge"><span data-lang="zh">合并两次导出</span><span data-lang="en">Merge two exports</span></a>
-      <a href="#files"><span data-lang="zh">图片与附件</span><span data-lang="en">Images and attachments</span></a>
-      <a href="#privacy-compare"><span data-lang="zh">隐私路线对比</span><span data-lang="en">Local vs cloud</span></a>
-      <a href="#demo"><span data-lang="zh">chat-demo 是什么</span><span data-lang="en">What is chat-demo</span></a>
-      <a href="#size"><span data-lang="zh">导出包瘦身</span><span data-lang="en">Shrinking an export</span></a>
-      <a href="#backup"><span data-lang="zh">备份与迁移</span><span data-lang="en">Backup and migration</span></a>
-      <a href="#faq"><span data-lang="zh">导出常见问题</span><span data-lang="en">Export FAQ</span></a>
+      <div class="toc-title"><span data-lang="en">All articles</span></div>
+      <a href="#structure"><span data-lang="en">Export structure</span></a>
+      <a href="#subset"><span data-lang="en">Keep a subset</span></a>
+      <a href="#merge"><span data-lang="en">Merge two exports</span></a>
+      <a href="#files"><span data-lang="en">Images and attachments</span></a>
+      <a href="#privacy-compare"><span data-lang="en">Local vs cloud</span></a>
+      <a href="#demo"><span data-lang="en">What is chat-demo</span></a>
+      <a href="#size"><span data-lang="en">Shrinking an export</span></a>
+      <a href="#backup"><span data-lang="en">Backup and migration</span></a>
+      <a href="#faq"><span data-lang="en">Export FAQ</span></a>
     </aside>
 
     <article class="doc-body">
-      <h2 id="structure"><span data-lang="zh">DeepSeek 导出包结构详解</span><span data-lang="en">What's inside a DeepSeek export</span></h2>
-      <p><span data-lang="zh">manifest、索引、会话 JSON、附件目录各自负责什么，为什么条目顺序会是硬约束，会话里的消息树是怎么用 <code>parent_id</code> 串起来的。</span><span data-lang="en">What the manifest, index, session JSON and attachment folders each do, why entry order is a hard constraint, and how the message tree is linked through <code>parent_id</code>.</span></p>
-      <p><a class="btn" href="deepseek-export-structure.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="structure"><span data-lang="en">What's inside a DeepSeek export</span></h2>
+      <p><span data-lang="en">What the manifest, index, session JSON and attachment folders each do, why entry order is a hard constraint, and how the message tree is linked through <code>parent_id</code>.</span></p>
+      <p><a class="btn" href="deepseek-export-structure.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="subset"><span data-lang="zh">只保留部分对话并导入 chat-demo</span><span data-lang="en">Keep only some conversations</span></h2>
-      <p><span data-lang="zh">导入会覆盖 demo 里的全部对话，所以要先裁出子集。这篇给出从载入、检索、预览、勾选、校验到导出的完整步骤，以及同名标题、带图片会话这些坑。</span><span data-lang="en">Importing replaces every conversation in the demo, so you need a subset first: load, search, preview, select, validate, export — plus the traps around duplicate titles and conversations with images.</span></p>
-      <p><a class="btn" href="keep-subset-of-chats.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="subset"><span data-lang="en">Keep only some conversations</span></h2>
+      <p><span data-lang="en">Importing replaces every conversation in the demo, so you need a subset first: load, search, preview, select, validate, export — plus the traps around duplicate titles and conversations with images.</span></p>
+      <p><a class="btn" href="keep-subset-of-chats.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="merge"><span data-lang="zh">两次导出怎么合并</span><span data-lang="en">Merging two exports</span></h2>
-      <p><span data-lang="zh">同一组对话在不同日期各导出一次，两份各有新增与改动。这篇讲冲突到底怎么判定、为什么消息 id 会被重排、当前分支该选哪个叶子。</span><span data-lang="en">The same conversation exported twice, each with its own new messages and edits. How conflicts are actually decided, why message ids get renumbered, and which leaf the current branch should point at.</span></p>
-      <p><a class="btn" href="merge-deepseek-exports.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="merge"><span data-lang="en">Merging two exports</span></h2>
+      <p><span data-lang="en">The same conversation exported twice, each with its own new messages and edits. How conflicts are actually decided, why message ids get renumbered, and which leaf the current branch should point at.</span></p>
+      <p><a class="btn" href="merge-deepseek-exports.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="files"><span data-lang="zh">导出里的图片和附件怎么处理</span><span data-lang="en">Images and attachments</span></h2>
-      <p><span data-lang="zh">附件存在 <code>&lt;id&gt;_files/</code> 里，靠 <code>export_path</code> 字符串与消息关联。这篇讲清为什么导入后图片会裂、中文文件名为什么不行、打包时要守的四条规则。</span><span data-lang="en">Attachments live under <code>&lt;id&gt;_files/</code> and are linked to messages by an <code>export_path</code> string. Why images break after import, why non-ASCII names fail, and the four packaging rules.</span></p>
-      <p><a class="btn" href="export-attachments.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="files"><span data-lang="en">Images and attachments</span></h2>
+      <p><span data-lang="en">Attachments live under <code>&lt;id&gt;_files/</code> and are linked to messages by an <code>export_path</code> string. Why images break after import, why non-ASCII names fail, and the four packaging rules.</span></p>
+      <p><a class="btn" href="export-attachments.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="privacy-compare"><span data-lang="zh">聊天记录导出交给谁：本地 vs 网盘 vs 在线转换</span><span data-lang="en">Who gets your export: local vs cloud</span></h2>
-      <p><span data-lang="zh">三条路线的横向对比，以及怎么用断网测试、Network 面板、搜源码三种方法，自己验证一个「本地工具」是不是真的不上传。</span><span data-lang="en">Three routes compared, plus three ways to verify a “local tool” really does not upload: go offline, watch the Network panel, read the source.</span></p>
-      <p><a class="btn" href="local-vs-cloud-privacy.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="privacy-compare"><span data-lang="en">Who gets your export: local vs cloud</span></h2>
+      <p><span data-lang="en">Three routes compared, plus three ways to verify a “local tool” really does not upload: go offline, watch the Network panel, read the source.</span></p>
+      <p><a class="btn" href="local-vs-cloud-privacy.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="demo"><span data-lang="zh">chat-demo 是什么、能做什么</span><span data-lang="en">What is chat-demo</span></h2>
-      <p><span data-lang="zh">官方开源的 API 演示站，也是我们导出的落点。它对包结构有三个硬要求，导入是整包替换，不会影响你账号里的云端对话。</span><span data-lang="en">DeepSeek's open-source API demo and the destination for our exports: three hard package rules, import replaces everything, and your cloud account is untouched.</span></p>
-      <p><a class="btn" href="what-is-chat-demo.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="demo"><span data-lang="en">What is chat-demo</span></h2>
+      <p><span data-lang="en">DeepSeek's open-source API demo and the destination for our exports: three hard package rules, import replaces everything, and your cloud account is untouched.</span></p>
+      <p><a class="btn" href="what-is-chat-demo.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="size"><span data-lang="zh">导出包太大怎么办</span><span data-lang="en">My export is huge</span></h2>
-      <p><span data-lang="zh">几十 MB 很正常，体积八九成来自图片。哪些瘦身手段真正有效、哪些做法（二次压缩、重压图片、手删附件）反而会把包弄坏。</span><span data-lang="en">Tens of MB is normal and images dominate. Which moves actually help, and which (re-zipping, re-compressing images, deleting attachments) break the package.</span></p>
-      <p><a class="btn" href="export-size-optimization.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="size"><span data-lang="en">My export is huge</span></h2>
+      <p><span data-lang="en">Tens of MB is normal and images dominate. Which moves actually help, and which (re-zipping, re-compressing images, deleting attachments) break the package.</span></p>
+      <p><a class="btn" href="export-size-optimization.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="backup"><span data-lang="zh">chat-demo 的数据怎么备份与迁移</span><span data-lang="en">Backing up chat-demo data</span></h2>
-      <p><span data-lang="zh">对话存在当前浏览器里，不跟账号走。换电脑、换浏览器、清理缓存之前怎么导出备份，换机后怎么恢复，以及五种会丢数据的场景。</span><span data-lang="en">Conversations live in the current browser, not in an account. How to back up before switching machines or clearing cache, how to restore, and five ways data disappears.</span></p>
-      <p><a class="btn" href="chat-demo-backup-migrate.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="backup"><span data-lang="en">Backing up chat-demo data</span></h2>
+      <p><span data-lang="en">Conversations live in the current browser, not in an account. How to back up before switching machines or clearing cache, how to restore, and five ways data disappears.</span></p>
+      <p><a class="btn" href="chat-demo-backup-migrate.html"><span data-lang="en">Read</span></a></p>
 
-      <h2 id="faq"><span data-lang="zh">DeepSeek 导出常见问题</span><span data-lang="en">DeepSeek export FAQ</span></h2>
-      <p><span data-lang="zh">10 个高频问题：包含什么、已删除的对话还在吗、能不能只导几组、格式会变吗、为什么导入会覆盖、图片为什么丢失、两份能否合并、多久导一次、安全吗。</span><span data-lang="en">Ten frequent questions: what is included, deleted chats, partial exports, format versions, why imports overwrite, missing images, merging, backup cadence, safety.</span></p>
-      <p><a class="btn" href="deepseek-export-faq.html"><span data-lang="zh">阅读全文</span><span data-lang="en">Read</span></a></p>
+      <h2 id="faq"><span data-lang="en">DeepSeek export FAQ</span></h2>
+      <p><span data-lang="en">Ten frequent questions: what is included, deleted chats, partial exports, format versions, why imports overwrite, missing images, merging, backup cadence, safety.</span></p>
+      <p><a class="btn" href="deepseek-export-faq.html"><span data-lang="en">Read</span></a></p>
     </article>
   </div>
 </div>
@@ -173,26 +169,26 @@ window.PAGE_META = {
           <span class="logo-word">ChatExtract</span>
         </a>
         <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
-          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          
           <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
         </p>
       </div>
       <div>
-        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
-        <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
-        <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
-        <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
-        <a href="fix.html"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
+        <h4><span data-lang="en">Tools</span></h4>
+        <a href="/en/subset-tool.html"><span data-lang="en">Subset extractor</span></a>
+        <a href="/en/merge-tool.html"><span data-lang="en">Version merger</span></a>
+        <a href="/en/guide.html"><span data-lang="en">Guide</span></a>
+        <a href="/en/fix.html"><span data-lang="en">Troubleshooting</span></a>
       </div>
       <div>
-        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
-        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
-        <a href="/en/guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
-        <a href="articles.html"><span data-lang="zh">全部文章</span><span data-lang="en">All articles</span></a>
-        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+        <h4><span data-lang="en">Notes</span></h4>
+        <a href="/en/privacy.html"><span data-lang="en">Privacy policy</span></a>
+        <a href="/en/guide.html#import"><span data-lang="en">Import into chat-demo</span></a>
+        <a href="/en/articles.html"><span data-lang="en">All articles</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="en">Source on GitHub</span></a>
       </div>
       <div class="footer-note">
-        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
         <span>ChatExtract</span>
       </div>
     </div>

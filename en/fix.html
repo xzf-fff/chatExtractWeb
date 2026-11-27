@@ -35,10 +35,6 @@
 <script>try{var t=localStorage.getItem('chatExtract.theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}</script>
 <script>
 window.PAGE_META = {
-  zh: {
-    title: 'chat-demo 导入报错怎么办：文件内容不完整 / 消息分支已损坏 / 附件数据已损坏 · ChatExtract',
-    description: 'chat-demo 导入历史对话失败的四种常见原因与解决办法：无法识别该文件、文件内容不完整、消息分支已损坏、附件数据已损坏。'
-  },
   en: {
     title: 'Fixing chat-demo import errors: incomplete file, broken branch, corrupt attachment',
     description: 'Four common reasons a DeepSeek export fails to import into chat-demo — unrecognized file, incomplete content, broken message branch, corrupt attachment — and how to fix each.'
@@ -108,12 +104,12 @@ window.PAGE_META = {
     <span class="logo-word">ChatExtract</span>
   </a>
   <nav class="nav-links" aria-label="Main navigation">
-    <a href="/en/"><span data-lang="zh">首页</span><span data-lang="en">Home</span></a>
-    <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
-    <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
-    <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
-    <a href="fix.html" aria-current="page"><span data-lang="zh">报错排查</span><span data-lang="en">Troubleshooting</span></a>
-  <a href="articles.html"><span data-lang="zh">文章</span><span data-lang="en">Articles</span></a>
+    <a href="/en/"><span data-lang="en">Home</span></a>
+    <a href="/en/subset-tool.html"><span data-lang="en">Subset extractor</span></a>
+    <a href="/en/merge-tool.html"><span data-lang="en">Version merger</span></a>
+    <a href="/en/guide.html"><span data-lang="en">Guide</span></a>
+    <a href="/en/fix.html" aria-current="page"><span data-lang="en">Troubleshooting</span></a>
+  <a href="/en/articles.html"><span data-lang="en">Articles</span></a>
   </nav>
   <div class="nav-right">
     <div class="lang-switch" role="group" aria-label="Language">
@@ -131,58 +127,58 @@ window.PAGE_META = {
 
 <div class="doc-hero">
   <div class="container">
-    <h1><span data-lang="zh">chat-demo 导入报错排查</span><span data-lang="en">chat-demo import troubleshooting</span></h1>
-    <p><span data-lang="zh">四种最常见的导入失败：先看现象，再看原因，最后按步骤解决。</span><span data-lang="en">The four most common import failures: symptom, cause, then the fix.</span></p>
+    <h1><span data-lang="en">chat-demo import troubleshooting</span></h1>
+    <p><span data-lang="en">The four most common import failures: symptom, cause, then the fix.</span></p>
   </div>
 </div>
 
 <div class="container">
   <div class="doc-layout">
     <aside class="toc" aria-label="On this page">
-      <div class="toc-title"><span data-lang="zh">本页目录</span><span data-lang="en">On this page</span></div>
-      <a href="#unrecognized"><span data-lang="zh">无法识别该文件</span><span data-lang="en">Unrecognized file</span></a>
-      <a href="#incomplete"><span data-lang="zh">文件内容不完整</span><span data-lang="en">Incomplete content</span></a>
-      <a href="#branch"><span data-lang="zh">消息分支已损坏</span><span data-lang="en">Broken branch</span></a>
-      <a href="#attachment"><span data-lang="zh">附件数据已损坏</span><span data-lang="en">Corrupt attachment</span></a>
-      <a href="#why"><span data-lang="zh">为什么手改 ZIP 容易坏</span><span data-lang="en">Why hand-editing fails</span></a>
-      <a href="#fix"><span data-lang="zh">用工具一次解决</span><span data-lang="en">Fix it with the tools</span></a>
+      <div class="toc-title"><span data-lang="en">On this page</span></div>
+      <a href="#unrecognized"><span data-lang="en">Unrecognized file</span></a>
+      <a href="#incomplete"><span data-lang="en">Incomplete content</span></a>
+      <a href="#branch"><span data-lang="en">Broken branch</span></a>
+      <a href="#attachment"><span data-lang="en">Corrupt attachment</span></a>
+      <a href="#why"><span data-lang="en">Why hand-editing fails</span></a>
+      <a href="#fix"><span data-lang="en">Fix it with the tools</span></a>
     </aside>
 
     <article class="doc-body">
-      <h2 id="unrecognized"><span data-lang="zh">「无法识别该文件」</span><span data-lang="en">“Unrecognized file”</span></h2>
-      <p><span data-lang="zh"><strong>现象：</strong>选完 ZIP 立刻报错，连导入进度都没有出现。</span><span data-lang="en"><strong>Symptom:</strong> the error appears right after picking the ZIP, before any progress.</span></p>
-      <p><span data-lang="zh"><strong>原因：</strong>包内<strong>第一个条目不是 <code>manifest.json</code></strong>，或缺少 <code>export_format_version: 3</code>。demo 按条目流顺序解析，先读 manifest 判断格式；用系统压缩工具（右键 → 压缩）重打一次包，就会把条目顺序打乱。</span><span data-lang="en"><strong>Cause:</strong> <code>manifest.json</code> is not the <strong>first entry</strong>, or <code>export_format_version: 3</code> is missing. The demo parses the archive as a stream and reads the manifest first; re-zipping with the OS “Compress” command reorders entries.</span></p>
-      <p><span data-lang="zh"><strong>解决：</strong>用本工具导出（固定把 manifest 写成第一个条目），不要用系统压缩工具二次打包。</span><span data-lang="en"><strong>Fix:</strong> export with these tools (manifest is always written first); never re-zip with the OS archiver.</span></p>
+      <h2 id="unrecognized"><span data-lang="en">“Unrecognized file”</span></h2>
+      <p><span data-lang="en"><strong>Symptom:</strong> the error appears right after picking the ZIP, before any progress.</span></p>
+      <p><span data-lang="en"><strong>Cause:</strong> <code>manifest.json</code> is not the <strong>first entry</strong>, or <code>export_format_version: 3</code> is missing. The demo parses the archive as a stream and reads the manifest first; re-zipping with the OS “Compress” command reorders entries.</span></p>
+      <p><span data-lang="en"><strong>Fix:</strong> export with these tools (manifest is always written first); never re-zip with the OS archiver.</span></p>
 
-      <h2 id="incomplete"><span data-lang="zh">「文件内容不完整」</span><span data-lang="en">“Incomplete content”</span></h2>
-      <p><span data-lang="zh"><strong>现象：</strong>导入进行到一半中止，会话列表没有更新。</span><span data-lang="en"><strong>Symptom:</strong> the import stops midway and the conversation list stays unchanged.</span></p>
-      <p><span data-lang="zh"><strong>原因：</strong><code>chat_session_index.json</code> 里的会话 id 集合与包内 <code>chat_sessions/*.json</code> <strong>不完全相等</strong>（多一个少一个都不行）；或者索引被排在了会话文件之前——demo 会把后面的会话当成附件。</span><span data-lang="en"><strong>Cause:</strong> the ids in <code>chat_session_index.json</code> do not <strong>exactly match</strong> the packaged <code>chat_sessions/*.json</code>; or the index sits before the session files, so later entries get treated as attachments.</span></p>
-      <p><span data-lang="zh"><strong>解决：</strong>只保留部分对话时，<strong>必须同时裁剪索引</strong>；顺序固定为 <code>manifest → user.json → 会话 → 索引 → 附件</code>。</span><span data-lang="en"><strong>Fix:</strong> when keeping a subset, <strong>prune the index too</strong>; the order must be <code>manifest → user.json → sessions → index → attachments</code>.</span></p>
+      <h2 id="incomplete"><span data-lang="en">“Incomplete content”</span></h2>
+      <p><span data-lang="en"><strong>Symptom:</strong> the import stops midway and the conversation list stays unchanged.</span></p>
+      <p><span data-lang="en"><strong>Cause:</strong> the ids in <code>chat_session_index.json</code> do not <strong>exactly match</strong> the packaged <code>chat_sessions/*.json</code>; or the index sits before the session files, so later entries get treated as attachments.</span></p>
+      <p><span data-lang="en"><strong>Fix:</strong> when keeping a subset, <strong>prune the index too</strong>; the order must be <code>manifest → user.json → sessions → index → attachments</code>.</span></p>
 
-      <h2 id="branch"><span data-lang="zh">「消息分支已损坏」</span><span data-lang="en">“Message branch is broken”</span></h2>
-      <p><span data-lang="zh"><strong>现象：</strong>导入成功，但打开某个对话时报错或显示空白。</span><span data-lang="en"><strong>Symptom:</strong> import succeeds, but opening a conversation fails or shows nothing.</span></p>
-      <p><span data-lang="zh"><strong>原因：</strong><code>current_message_id</code> 或某条消息的 <code>parent_id</code> 指向了<strong>不存在的消息</strong>。手工拼接两份导出、或合并后没有重算消息 id 与父链时最容易触发。</span><span data-lang="en"><strong>Cause:</strong> <code>current_message_id</code> or some message's <code>parent_id</code> points at a <strong>message that does not exist</strong> — typical when splicing two exports together or merging without recomputing ids and parents.</span></p>
-      <p><span data-lang="zh"><strong>解决：</strong>用版本合并器重新合并：它会按内容对齐两份导出、重算消息 id 与父链，并让「当前分支」指向真实存在的叶子。</span><span data-lang="en"><strong>Fix:</strong> re-merge with the version merger: it aligns both exports by content, recomputes message ids and parent links, and points the current branch at an existing leaf.</span></p>
+      <h2 id="branch"><span data-lang="en">“Message branch is broken”</span></h2>
+      <p><span data-lang="en"><strong>Symptom:</strong> import succeeds, but opening a conversation fails or shows nothing.</span></p>
+      <p><span data-lang="en"><strong>Cause:</strong> <code>current_message_id</code> or some message's <code>parent_id</code> points at a <strong>message that does not exist</strong> — typical when splicing two exports together or merging without recomputing ids and parents.</span></p>
+      <p><span data-lang="en"><strong>Fix:</strong> re-merge with the version merger: it aligns both exports by content, recomputes message ids and parent links, and points the current branch at an existing leaf.</span></p>
 
-      <h2 id="attachment"><span data-lang="zh">「附件数据已损坏」</span><span data-lang="en">“Attachment data is corrupt”</span></h2>
-      <p><span data-lang="zh"><strong>现象：</strong>正文能看，但图片全部裂开。</span><span data-lang="en"><strong>Symptom:</strong> text renders but every image is broken.</span></p>
-      <p><span data-lang="zh"><strong>原因：</strong>FILE 片段里的 <code>export_path</code> 与包内实际路径不一致，或附件文件缺失；另外条目名含非 ASCII 字符（例如中文文件名）也会被 demo 拒绝。</span><span data-lang="en"><strong>Cause:</strong> the FILE fragment's <code>export_path</code> does not match the packaged path, or the file is missing; non-ASCII entry names (e.g. Chinese filenames) are also rejected.</span></p>
-      <p><span data-lang="zh"><strong>解决：</strong>附件保持 <code>chat_sessions/&lt;会话 id&gt;_files/&lt;文件名&gt;</code> 原路径原样复制，不改名、不移动。</span><span data-lang="en"><strong>Fix:</strong> copy attachments verbatim to <code>chat_sessions/&lt;session-id&gt;_files/&lt;filename&gt;</code> — no renaming, no moving.</span></p>
+      <h2 id="attachment"><span data-lang="en">“Attachment data is corrupt”</span></h2>
+      <p><span data-lang="en"><strong>Symptom:</strong> text renders but every image is broken.</span></p>
+      <p><span data-lang="en"><strong>Cause:</strong> the FILE fragment's <code>export_path</code> does not match the packaged path, or the file is missing; non-ASCII entry names (e.g. Chinese filenames) are also rejected.</span></p>
+      <p><span data-lang="en"><strong>Fix:</strong> copy attachments verbatim to <code>chat_sessions/&lt;session-id&gt;_files/&lt;filename&gt;</code> — no renaming, no moving.</span></p>
 
-      <h2 id="why"><span data-lang="zh">为什么手改 ZIP 容易坏</span><span data-lang="en">Why hand-editing a ZIP breaks</span></h2>
-      <p><span data-lang="zh">demo 的导入器比大多数工具严格，四条硬约束叠在一起，手工操作很容易踩中其中一条：</span><span data-lang="en">The demo's importer is stricter than most tools; four hard constraints stack up:</span></p>
+      <h2 id="why"><span data-lang="en">Why hand-editing a ZIP breaks</span></h2>
+      <p><span data-lang="en">The demo's importer is stricter than most tools; four hard constraints stack up:</span></p>
       <ol>
-        <li><span data-lang="zh"><strong>条目顺序</strong>：manifest 必须第一个，附件必须在索引之后。</span><span data-lang="en"><strong>Entry order</strong>: manifest first, attachments after the index.</span></li>
-        <li><span data-lang="zh"><strong>id 集合相等</strong>：索引与包内会话文件必须一一对应。</span><span data-lang="en"><strong>Matching id sets</strong>: index entries and session files must correspond one to one.</span></li>
-        <li><span data-lang="zh"><strong>ZIP 限制</strong>：只接受 Store / Deflate，不支持 ZIP64、data descriptor、加密包和非 ASCII 条目名。</span><span data-lang="en"><strong>ZIP limits</strong>: Store/Deflate only; no ZIP64, data descriptor, encryption, or non-ASCII entry names.</span></li>
-        <li><span data-lang="zh"><strong>字段校验</strong>：时间戳格式、<code>role</code>/<code>status</code> 枚举、<code>parent_id</code> 与 <code>current_message_id</code> 必须自洽。</span><span data-lang="en"><strong>Field checks</strong>: timestamp format, <code>role</code>/<code>status</code> enums, and self-consistent <code>parent_id</code>/<code>current_message_id</code>.</span></li>
+        <li><span data-lang="en"><strong>Entry order</strong>: manifest first, attachments after the index.</span></li>
+        <li><span data-lang="en"><strong>Matching id sets</strong>: index entries and session files must correspond one to one.</span></li>
+        <li><span data-lang="en"><strong>ZIP limits</strong>: Store/Deflate only; no ZIP64, data descriptor, encryption, or non-ASCII entry names.</span></li>
+        <li><span data-lang="en"><strong>Field checks</strong>: timestamp format, <code>role</code>/<code>status</code> enums, and self-consistent <code>parent_id</code>/<code>current_message_id</code>.</span></li>
       </ol>
 
-      <h2 id="fix"><span data-lang="zh">用工具一次解决</span><span data-lang="en">Fix it in one go</span></h2>
-      <p><span data-lang="zh">两个工具在导出前都会按上面四条逐项校验，发现错误直接阻止导出并指出具体会话；导出后还会重新解析成品做自检（首条目、顺序、CRC、索引一致性），通过才给你下载。所以只要用它们打包，这四种报错基本不会出现。</span><span data-lang="en">Both tools validate all four rules before exporting, block on errors with the offending conversation named, then re-parse the produced ZIP (first entry, order, CRC, index consistency) before offering the download — so these four errors practically disappear.</span></p>
-      <p><a class="btn btn-primary" href="/en/subset-tool.html"><span data-lang="zh">打开子集提取</span><span data-lang="en">Open subset extractor</span></a>
-        <a class="btn" href="/en/merge-tool.html"><span data-lang="zh">打开版本合并</span><span data-lang="en">Open version merger</span></a></p>
-      <p><span data-lang="zh" style="color:var(--tx3);font-size:13px">导入前请先备份：demo 的导入会覆盖本地全部对话。详见<a href="/en/guide.html#import">使用指南</a>。</span><span data-lang="en" style="color:var(--tx3);font-size:13px">Back up first: importing replaces all conversations in the demo. See the <a href="/en/guide.html#import">guide</a>.</span></p>
+      <h2 id="fix"><span data-lang="en">Fix it in one go</span></h2>
+      <p><span data-lang="en">Both tools validate all four rules before exporting, block on errors with the offending conversation named, then re-parse the produced ZIP (first entry, order, CRC, index consistency) before offering the download — so these four errors practically disappear.</span></p>
+      <p><a class="btn btn-primary" href="/en/subset-tool.html"><span data-lang="en">Open subset extractor</span></a>
+        <a class="btn" href="/en/merge-tool.html"><span data-lang="en">Open version merger</span></a></p>
+      <p><span data-lang="en" style="color:var(--tx3);font-size:13px">Back up first: importing replaces all conversations in the demo. See the <a href="/en/guide.html#import">guide</a>.</span></p>
     </article>
   </div>
 </div>
@@ -196,26 +192,26 @@ window.PAGE_META = {
           <span class="logo-word">ChatExtract</span>
         </a>
         <p style="margin-top:12px;color:var(--tx3);font-size:13px;max-width:30em">
-          <span data-lang="zh">面向 DeepSeek 导出数据的本地小工具。非官方项目。</span>
+          
           <span data-lang="en">Small local tools for DeepSeek export data. Unofficial project.</span>
         </p>
       </div>
       <div>
-        <h4><span data-lang="zh">工具</span><span data-lang="en">Tools</span></h4>
-        <a href="/en/subset-tool.html"><span data-lang="zh">子集提取</span><span data-lang="en">Subset extractor</span></a>
-        <a href="/en/merge-tool.html"><span data-lang="zh">版本合并</span><span data-lang="en">Version merger</span></a>
-        <a href="/en/guide.html"><span data-lang="zh">使用指南</span><span data-lang="en">Guide</span></a>
+        <h4><span data-lang="en">Tools</span></h4>
+        <a href="/en/subset-tool.html"><span data-lang="en">Subset extractor</span></a>
+        <a href="/en/merge-tool.html"><span data-lang="en">Version merger</span></a>
+        <a href="/en/guide.html"><span data-lang="en">Guide</span></a>
       </div>
       <div>
-        <h4><span data-lang="zh">说明</span><span data-lang="en">Notes</span></h4>
-        <a href="privacy.html"><span data-lang="zh">隐私政策</span><span data-lang="en">Privacy policy</span></a>
-        <a href="fix.html"><span data-lang="zh">导入报错排查</span><span data-lang="en">Import troubleshooting</span></a>
-        <a href="/en/guide.html#import"><span data-lang="zh">导入 chat-demo</span><span data-lang="en">Import into chat-demo</span></a>
-        <a href="/en/guide.html#privacy"><span data-lang="zh">隐私与数据</span><span data-lang="en">Privacy and data</span></a>
-        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="zh">GitHub 源码</span><span data-lang="en">Source on GitHub</span></a>
+        <h4><span data-lang="en">Notes</span></h4>
+        <a href="/en/privacy.html"><span data-lang="en">Privacy policy</span></a>
+        <a href="/en/fix.html"><span data-lang="en">Import troubleshooting</span></a>
+        <a href="/en/guide.html#import"><span data-lang="en">Import into chat-demo</span></a>
+        <a href="/en/guide.html#privacy"><span data-lang="en">Privacy and data</span></a>
+        <a href="https://github.com/xzf-fff/chatExtractWeb" target="_blank" rel="noopener"><span data-lang="en">Source on GitHub</span></a>
       </div>
       <div class="footer-note">
-        <span><span data-lang="zh">chat-demo 采用 MIT 许可（Copyright © 2026 DeepSeek），其源码与许可见官方仓库。</span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
+        <span><span data-lang="en">chat-demo is MIT licensed (Copyright © 2026 DeepSeek); its source and license live in the official repo.</span></span>
         <span>ChatExtract</span>
       </div>
     </div>
